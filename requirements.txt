@@ -2,3 +2,5 @@ Flask
 Flask-SQLAlchemy
 pyodbc
 gunicorn
+Flask-Login
+Flask-Cors
