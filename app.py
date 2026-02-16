@@ -84,5 +84,31 @@ def manage_social_media_page(artist_id):
 def forbidden(_):
     return render_template("403.html"), 403
 
+import os
+import sys
+
+@app.route("/diag")
+def diagnostics():
+    diag_info = []
+    diag_info.append(f"Python Version: {sys.version}")
+    diag_info.append(f"Current Directory: {os.getcwd()}")
+    diag_info.append("Environment Variables (Keys only): " + ", ".join(os.environ.keys()))
+    
+    try:
+        import pyodbc
+        drivers = pyodbc.drivers()
+        diag_info.append(f"Installed ODBC Drivers: {drivers}")
+    except Exception as e:
+        diag_info.append(f"Error checking ODBC drivers: {e}")
+
+    try:
+        from artistportal.extensions import db
+        # Attempt minimal DB check
+        diag_info.append(f"DB URI Configured: {app.config.get('SQLALCHEMY_DATABASE_URI', 'Not Set')}")
+    except Exception as e:
+        diag_info.append(f"Error accessing app config: {e}")
+
+    return "<br>".join(diag_info)
+
 if __name__ == "__main__":
     app.run(debug=True)

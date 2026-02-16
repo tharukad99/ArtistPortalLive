@@ -68,6 +68,9 @@ def create_app(config_object="config.Config"):
     # Create tables (simple dev approach)
     # In production, use migrations (Flask-Migrate/Alembic).
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"Error creating database tables (ignoring to allow app startup): {e}")
 
     return app
