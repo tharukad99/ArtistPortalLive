@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block page_title %}Social Media{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<!-- Summary cards -->
+<div class="card-row">
+    <div class="card">
+        <div class="card-label">Followers</div>
+        <div class="card-value" id="followers-count">-</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Views</div>
+        <div class="card-value" id="views-count">-</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Streams</div>
+        <div class="card-value" id="streams-count">-</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Tickets</div>
+        <div class="card-value" id="tickets-count">-</div>
+    </div>
+</div>
+
+<!-- Charts row -->
+<div class="row">
+    <div class="card wide">
+        <div class="card-title">Social Media Growth</div>
+        <canvas id="growth-chart" height="150"></canvas>
+    </div>
+
+    <div class="card wide">
+        <div class="card-title">Engagement</div>
+        <canvas id="engagement-chart" height="150"></canvas>
+    </div>
+</div>
+
+<!-- Social links -->
+<div class="card">
+    <div class="card-title">Social Links</div>
+    <div id="social-links" class="social-links">
+        <!-- JS will inject social link cards here -->
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/social_media.js') }}"></script>
+{% endblock %}

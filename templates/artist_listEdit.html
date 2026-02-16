@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"
+<head>
+    <meta charset="UTF-8">
+    <title>Artists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Centered container */
+        .artist-list-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .artist-page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .artist-page-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        /* Artist grid */
+        .artist-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .artist-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .artist-card:hover {
+            background: #f5f5f5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        .artist-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .artist-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="artist-list-wrapper">
+
+    <div class="artist-page-title">Artist List Manage by Admin</div>
+    <div class="artist-page-subtitle">
+        <!-- Choose an artist to view their followers, streams and activities. -->
+    </div>
+
+    <div id="artist-list" class="artist-list">
+        <!-- JS injects cards here -->
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/artists_listEdit.js') }}"></script>
+
+</body>
+</html>

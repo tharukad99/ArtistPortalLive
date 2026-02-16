@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Artists - ArtiSights</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/manage_artists.css') }}">
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sidebar-header">
+        <a class="brand" href="/admin/manage-artists">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ArtiSights Logo" class="sidebar-logo">
+        </a>
+      </div>
+
+      <!-- 👤 Admin Login -->
+      <div class="admin-block">
+        <div class="admin-user">
+          👤 Admin
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <a class="nav-link active" href="/admin/manage-artists">
+          Manage Artists
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-note">© 2025 Lepus Art</div>
+      </div>
+
+    </aside>
+
+
+
+
+
+
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;">
+          <button id="sidebarToggle" class="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h1 class="page-title">Manage Artists</h1>
+        </div>
+
+        <div class="page-actions">
+          <input id="searchBox" class="search" type="text" placeholder="Search by stage name..." />
+          <button id="btnAdd" type="button" class="btn-primary">+ Add Artist</button>
+          <a href="/logout" class="btn-logout" id="btnLogout">Logout</a>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="card-top">
+          <h3 class="card-title">Artists</h3>
+          <div id="status" class="status"></div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="artistsTable">
+            <thead>
+              <tr>
+                <th style="width:90px;">Photo</th>
+                <th>Stage Name</th>
+                <th>Country</th>
+                <th>Genre</th>
+                <th style="width:110px;">Active</th>
+                <th style="width:180px;">Created</th>
+                <th style="width:140px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="artistsTbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Backdrop -->
+  <div id="modalBackdrop" class="modal-backdrop" hidden></div>
+
+  <!-- Modal -->
+  <div id="artistModal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Add Artist</h2>
+        <button type="button" class="icon-btn" id="btnCloseModal" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="artistId" value="0" />
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Stage Name *</span>
+            <input id="stageName" type="text" placeholder="Anna Russell-Martin" />
+          </label>
+
+          <label class="field">
+            <span>Full Name</span>
+            <input id="fullName" type="text" placeholder="Anna Russell-Martin" />
+          </label>
+
+          <label class="field">
+            <span>Country</span>
+            <input id="country" type="text" placeholder="UK" />
+          </label>
+
+          <label class="field">
+            <span>Primary Genre</span>
+            <input id="primaryGenre" type="text" placeholder="Acting / Theatre" />
+          </label>
+
+          <label class="field span-2">
+            <span>Website URL</span>
+            <input id="websiteUrl" type="url" placeholder="https://..." />
+          </label>
+
+          <label class="field span-2">
+            <span>Profile Image URL</span>
+            <input id="profileImageUrl" type="url" placeholder="https://.../photo.jpg" />
+          </label>
+
+          <label class="field span-2">
+            <span>Bio</span>
+            <textarea id="bio" rows="5" placeholder="Short bio..."></textarea>
+          </label>
+        </div>
+
+        <label class="checkbox">
+          <input id="isActive" type="checkbox" checked />
+          <span>Active</span>
+        </label>
+
+        <div id="formError" class="form-error"></div>
+      </div>
+
+      <!-- ✅ UPDATED footer: left Delete (only in edit), right Cancel/Save -->
+      <div class="modal-footer modal-footer-split">
+        <button type="button" class="btn-danger-outline" id="btnDeleteInModal" hidden>
+          Delete Artist
+        </button>
+
+        <div class="modal-footer-right">
+          <button type="button" class="btn-secondary" id="btnCancel">Cancel</button>
+          <button type="button" class="btn-primary" id="btnSave">Save</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/manage_artists.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+
+</html>

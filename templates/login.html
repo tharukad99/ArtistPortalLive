@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login</title>
+
+<style>
+:root{
+--muted:#9ca3af;
+--shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+font-family:system-ui;
+background:#ffffff;
+color:#111827;
+}
+
+/* center container */
+.page{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* login card */
+.card{
+width:min(380px,92vw);
+padding:28px;
+border-radius:22px;
+background:#ffffff;
+box-shadow:var(--shadow);
+border:1px solid #e5e7eb;
+}
+
+h2{
+margin:0 0 18px;
+font-size:22px;
+}
+
+.field{
+margin-bottom:14px;
+}
+
+label{
+display:block;
+font-size:12px;
+color:#6b7280;
+margin-bottom:6px;
+}
+
+input{
+width:100%;
+padding:12px;
+border-radius:14px;
+border:1px solid #e5e7eb;
+background:#f3f4f6;
+outline:none;
+}
+
+input:focus{
+border-color:#7c3aed;
+background:#fff;
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-top:18px;
+}
+
+.btn{
+height:44px;
+padding:0 22px;
+border-radius:14px;
+border:none;
+cursor:pointer;
+font-weight:600;
+font-size:14px;
+}
+
+.login{
+background:#111827;
+color:white;
+}
+
+.login:hover{
+opacity:.9;
+}
+
+.back{
+background:#e5e7eb;
+color:#111827;
+}
+
+.flash{
+margin-bottom:12px;
+}
+
+.flash div{
+padding:10px;
+border-radius:10px;
+background:#f3f4f6;
+margin-bottom:6px;
+}
+
+/* footer */
+.footer{
+padding:20px 0;
+font-size:12px;
+color:#6b7280;
+text-align:center;
+}
+
+.footer a{
+color:#111827;
+text-decoration:none;
+border-bottom:1px dashed rgba(0,0,0,.25);
+}
+
+.footer a:hover{
+opacity:.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="card">
+
+    <h2>Login</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash">
+    {% for category, message in messages %}
+      <div>{{ message }}</div>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login_post') }}">
+
+      <div class="field">
+        <label>Username</label>
+        <input name="username" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
+
+      <div class="actions">
+        <a href="/">
+          <button class="btn back" type="button">Back</button>
+        </a>
+
+        <button class="btn login" type="submit">Login</button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<div class="footer">
+© 2025 <a href="https://www.lepus-arts.com/" target="_blank">Lepus Art</a>
+</div>
+
+</body>
+</html>

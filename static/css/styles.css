@@ -1,0 +1,1504 @@
+/* Layout */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f7;
+  color: #111827;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #111827;
+  color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+}
+
+.sidebar-header .logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+/* Increase gap between logo and artist profile */
+
+.sidebar-header {
+  margin-bottom: 28px;
+  /* 👈 adjust (20–40px looks good) */
+}
+
+
+
+.artist-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.artist-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.artist-name {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.nav {
+  margin-top: 16px;
+}
+
+.nav-item {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #e5e7eb;
+  text-decoration: none;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.nav-item:hover {
+  background: #1f2937;
+}
+
+.nav-item.active {
+  background: #374151;
+}
+
+/* Main area */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Topbar login, logout buttons */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.topbar-btn.login {
+  background: #111;
+  color: white;
+}
+
+.topbar-btn.login:hover {
+  background: #333;
+}
+
+.topbar-btn.logout {
+  background: #eee;
+  color: #333;
+}
+
+.topbar-btn.logout:hover {
+  background: #ddd;
+}
+
+
+/* ====================== Profile update Page ====================== */
+.btn-primary,
+.btn-secondary {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+
+/* Primary = main action (Update / Save) */
+.btn-primary {
+  background: #111111;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+
+/* Primary = main action (Update / Save) */
+.btn-primary {
+  background: #111;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+
+/* UPDATE DETAILS */
+#btnEditProfile {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s ease;
+
+  background: #e9f1ff;
+  color: #2458d3;
+}
+
+#btnEditProfile:hover {
+  background: #dbe7ff;
+  transform: translateY(-1px);
+}
+
+
+/* PHOTO ACTION BUTTONS*/
+#btnAddPhoto,
+#btnDeletePhoto {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s ease;
+}
+
+/* ADD PHOTO */
+#btnAddPhoto {
+  background: #e7f7ef;
+  color: #0b7a45;
+}
+
+#btnAddPhoto:hover {
+  background: #d2f0e1;
+  transform: translateY(-1px);
+}
+
+/* DELETE PHOTO */
+#btnDeletePhoto {
+  background: #ffe8e8;
+  color: #b00000;
+}
+
+#btnDeletePhoto:hover {
+  background: #ffd6d6;
+  transform: translateY(-1px);
+}
+
+/* Card top alignment */
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  /* Allow wrapping on small screens */
+  gap: 10px;
+}
+
+
+.photo-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* ====================== Social Media update Page ====================== */
+
+
+#btnAddMetric {
+  background: #e7f7ef;
+  color: #0b7a45;
+}
+
+#btnAddLink {
+  background: #e7f7ef;
+  color: #0b7a45;
+}
+
+
+/* ====================== Activity update Page ====================== */
+
+
+#btnAddActivity {
+  background: #e7f7ef;
+  color: #0b7a45;
+}
+
+
+.btn-secondary1 {
+  background: #b00000;
+  color: #ffffff;
+}
+
+
+
+
+
+
+
+
+
+
+.page-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+} */
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  min-width: 220px;
+}
+
+.avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.page-content {
+  padding: 20px 24px 32px;
+}
+
+/* Cards */
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.card.wide {
+  min-height: 260px;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.card-value {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Recent activities list */
+#recent-activities {
+  margin-top: 8px;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+/* Timeline page */
+.timeline {
+  position: relative;
+  padding-left: 40px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -3px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #e5e7eb;
+}
+
+.timeline-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.timeline-meta {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Responsive */
+/* Responsive Mobile Sidebar */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-btn {
+  display: none;
+  /* Hidden on desktop */
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #111827;
+  margin-right: 16px;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    position: relative;
+    /* Context for absolute positioning if needed */
+  }
+
+  .sidebar {
+    /* display: none; <-- Removed this */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    z-index: 100;
+    /* High z-index */
+    transform: translateX(-100%);
+    /* Hidden by default */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .mobile-menu-btn {
+    display: inline-block;
+    /* Show on mobile */
+  }
+
+  .topbar .page-title {
+    font-size: 20px;
+    /* Slightly smaller on mobile */
+  }
+
+  /* Adjust grids */
+  .card-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .card-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* Artist list css */
+.artist-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.artist-card {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  background: #ffffff;
+  transition: box-shadow 0.15s ease, transform 0.1s ease, background 0.15s ease;
+}
+
+.artist-card:hover {
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+  background: #f9fafb;
+}
+
+.artist-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.artist-card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.artist-card-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.artist-card-genre {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Activities timeline */
+
+.timeline {
+  position: relative;
+  padding-left: 48px;
+}
+
+/* Vertical line */
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-date-group {
+  margin-bottom: 18px;
+}
+
+.timeline-date-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+/* Row = dot + content */
+.timeline-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Space for dot on the vertical line */
+.timeline-marker {
+  position: relative;
+  width: 44px;
+  /* enough to sit on the line */
+  height: 18px;
+}
+
+/* The dot itself */
+.timeline-dot {
+  position: absolute;
+  left: 16px;
+  /* align with ::before line (22px line - radius) */
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #e5e7eb;
+}
+
+/* icon + text */
+.timeline-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.timeline-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.timeline-text {
+  font-size: 15px;
+  color: #111827;
+}
+
+
+
+/* Back Button Style */
+.back-btn {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  margin-right: 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background: #d1d5db;
+}
+
+
+/* Social Links Page Styles */
+.social-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.15s;
+}
+
+.social-link:hover {
+  background: #f9fafb;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.social-icon {
+  font-size: 22px;
+  width: 28px;
+  text-align: center;
+}
+
+.social-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.social-url {
+  font-size: 12px;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.social-icon {
+  font-size: 22px;
+  width: 32px;
+  text-align: center;
+  color: #111827;
+}
+
+/* Platform colors (optional but recommended) */
+.social-link .fa-facebook-f {
+  color: #1877f2;
+}
+
+.social-link .fa-spotify {
+  color: #1db954;
+}
+
+.social-link .fa-instagram {
+  color: #e4405f;
+}
+
+.social-link .fa-youtube {
+  color: #ff0000;
+}
+
+.social-link .fa-x-twitter {
+  color: #111827;
+}
+
+.social-link .fa-apple {
+  color: #000;
+}
+
+.social-link .fa-bandcamp {
+  color: #629aa9;
+}
+
+
+/* Page container spacing */
+.page-content {
+  padding: 20px;
+}
+
+/* Each card should have clear separation */
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  /* IMPORTANT: space between cards */
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+}
+
+/* Card title separation */
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  /* IMPORTANT */
+  color: #111827;
+}
+
+/* Improve text clarity */
+.artist-bio-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.artist-bio-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.artist-bio-text {
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.7;
+  margin-bottom: 14px;
+  max-width: 900px;
+}
+
+/* Make links look clean */
+.artist-bio-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.bio-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  text-decoration: none;
+  font-size: 13px;
+  color: #111827;
+  transition: 0.15s ease;
+}
+
+.bio-link:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.bio-meta {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Artist Bio Row Layout */
+.artist-bio-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.artist-bio-left {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .artist-bio-row {
+    flex-direction: column;
+  }
+
+  .artist-bio-right {
+    justify-content: flex-start !important;
+    /* Override inline style if necessary or just align left */
+    margin-top: 10px;
+  }
+}
+
+/* Latest album box style */
+.album-box {
+  padding: 14px 14px;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  line-height: 1.6;
+}
+
+/* Recent activities list spacing */
+#recent-activities {
+  margin-top: 6px;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 14px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item div:first-child {
+  font-weight: 600;
+  color: #111827;
+}
+
+.activity-item div:last-child {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Gallery grid: nice spacing & responsive */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.gallery-item {
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  transition: 0.15s ease;
+}
+
+.gallery-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Artist Bio Row Layout */
+.artist-bio-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.artist-bio-left {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .artist-bio-row {
+    flex-direction: column;
+  }
+
+  .artist-bio-right {
+    justify-content: flex-start !important;
+    /* Override inline style if necessary or just align left */
+    margin-top: 10px;
+  }
+}
+
+/* Friendly empty state */
+.empty {
+  font-size: 14px;
+  color: #6b7280;
+  padding: 10px 0;
+}
+
+
+/* Timeline link styles */
+.timeline-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1px solid #e5e7eb;
+  color: #475569;
+  background: #fff;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.timeline-link:hover {
+  color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+}
+
+
+/* Logo styles */
+.logo-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-image {
+  max-width: 140px;
+  height: auto;
+  cursor: pointer;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-card {
+  width: min(720px, 92vw);
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #eee;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.form-grid input,
+.form-grid textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+
+
+.hidden {
+  display: none !important;
+}
+
+
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* Modal footer layout: left + right */
+.modal-actions-split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.modal-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+}
+
+.modal-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Delete button style */
+.btn-danger {
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+
+/* Table */
+.edit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.edit-table th,
+.edit-table td {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.muted {
+  color: #6b7280;
+  padding: 5px 8px;
+}
+
+/* Social link cards */
+.social-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.social-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Danger button */
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* ✅ Modal footer: Delete left, Cancel+Save right */
+.modal-actions-split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.modal-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+}
+
+.modal-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== Social Links: Activities-style table ===== */
+
+.social-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* table container */
+.table-wrap {
+  border: 1px solid rgba(15, 23, 42, .10);
+  border-radius: 22px;
+  overflow: hidden;
+  overflow-x: auto;
+  /* Allow horizontal scrolling */
+  background: #fff;
+}
+
+/* table */
+.list-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* header */
+.list-table thead th {
+  font-weight: 700;
+  color: #6b7280;
+  font-size: 14px;
+  padding: 16px 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, .10);
+}
+
+.list-table thead th:first-child {
+  padding-left: 22px;
+}
+
+.list-table thead th:last-child {
+  padding-right: 22px;
+}
+
+/* rows */
+.list-table tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+  vertical-align: middle;
+}
+
+.list-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* hover row */
+.list-table tbody tr {
+  transition: background .15s ease;
+}
+
+.list-table tbody tr:hover {
+  background: rgba(15, 23, 42, .02);
+}
+
+/* ===== Icon cell ===== */
+.icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: #f3f4f6;
+}
+
+.social-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* ===== Title cell ===== */
+.row-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.row-sub {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.2;
+  max-width: 740px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-primary {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ===== Round action buttons ===== */
+.round-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, .12);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+.round-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .10);
+  background: rgba(15, 23, 42, .02);
+}
+
+.round-btn i {
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 18px !important;
+}
+
+/* ===== Mobile: tighten columns ===== */
+@media (max-width: 720px) {
+  .list-table thead {
+    display: none;
+  }
+
+  .list-table,
+  .list-table tbody,
+  .list-table tr,
+  .list-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .list-table tbody td {
+    border-bottom: none;
+    padding: 10px 16px;
+  }
+
+  .list-table tbody tr {
+    border-bottom: 1px solid rgba(15, 23, 42, .08);
+    padding: 10px 0;
+  }
+
+  .actions-right {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================
+   Metrics table alignment + pagination UI
+   (put into smStyle.css)
+========================= */
+
+.metric-table-wrap {
+  border: 1px solid rgba(15, 23, 42, .10);
+  border-radius: 22px;
+  overflow: hidden;
+  overflow-x: auto;
+  /* Allow horizontal scrolling */
+  background: #fff;
+}
+
+/* table */
+.metric-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* header */
+.metric-table thead th {
+  font-weight: 800;
+  color: #6b7280;
+  font-size: 14px;
+  padding: 14px 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, .10);
+  text-align: left;
+}
+
+/* body cells */
+.metric-table tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+  vertical-align: middle;
+}
+
+.metric-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.metric-table tbody tr:hover {
+  background: rgba(15, 23, 42, .02);
+}
+
+/* column widths + alignment */
+.col-date {
+  width: 140px;
+}
+
+.col-platform {
+  width: 180px;
+}
+
+.col-value {
+  width: 140px;
+  text-align: right;
+  font-weight: 800;
+}
+
+.col-actions {
+  width: 150px;
+  text-align: right;
+}
+
+.metric-table .btn-secondary {
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+
+/* metric cell formatting */
+.metric-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.metric-code {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* pager */
+.metric-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(15, 23, 42, .10);
+  background: #fff;
+}
+
+.metric-pager-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pager-btn {
+  border: 1px solid rgba(15, 23, 42, .12);
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+.pager-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .10);
+  background: rgba(15, 23, 42, .02);
+}
+
+.pager-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pager-pill {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid rgba(15, 23, 42, .08);
+  font-size: 13px;
+  color: #111827;
+}
+
+/* mobile */
+@media (max-width: 720px) {
+  .col-platform {
+    width: auto;
+  }
+
+  .col-value {
+    width: 120px;
+  }
+
+  .col-actions {
+    width: 120px;
+  }
+
+  .metric-pager {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

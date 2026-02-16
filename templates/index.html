@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ArtiSights</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+
+<body>
+
+  <!-- Top right login -->
+  <a href="/login" class="login-btn">Login</a>
+
+  <!-- Centered content area -->
+  <main class="page">
+
+    <!-- Logo + tagline -->
+    <div class="hero">
+      <img
+        class="hero-logo"
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        alt="ArtiSights"
+      />
+      <div class="hero-tag">@ARTISIGHT • Artist Intelligence</div>
+    </div>
+
+    <!-- Main card -->
+    <section class="panel">
+
+      <p class="intro">
+        Select an artist to view followers, streams, activities, and profile insights.
+      </p>
+
+      <div class="tools">
+        <div class="search">
+          <span class="dot"></span>
+          <input id="artistSearch" placeholder="Search artists..." autocomplete="off" />
+        </div>
+
+        <button type="button" class="refresh" id="btnRefresh">Refresh</button>
+      </div>
+
+      <div id="artist-list" class="grid"></div>
+
+      <div class="hint">
+        Tip: Click an artist card to open the dashboard.
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer bottom -->
+  <div class="footer">
+    © 2025 <a href="https://www.lepus-arts.com/" target="_blank" rel="noopener noreferrer">Lepus Art</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>

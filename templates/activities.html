@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_title %}Activities{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<div class="card">
+    <div id="activities-timeline" class="timeline">
+        <!-- JS will inject timeline items here -->
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/activities.js') }}"></script>
+{% endblock %}

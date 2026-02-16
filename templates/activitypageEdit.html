@@ -1,0 +1,73 @@
+{% extends "baseArtistmode.html" %}
+
+{% block page_title %}Activities{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<div class="card">
+  <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="card-title">Activities</div>
+    <button id="btnAddActivity" class="btn-secondary" type="button">Add</button>
+  </div>
+
+  <div id="activities-timeline" class="timeline"></div>
+</div>
+
+<!-- ==================== MODAL: Add/Update Activity ==================== -->
+<div id="activityModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="activityModalTitle" style="margin:0;">Add Activity</h3>
+      <button id="btnCloseActivityModal" class="icon-btn" type="button">✕</button>
+    </div>
+
+    <input type="hidden" id="ActivityId" value="0">
+
+    <div class="form-grid">
+      <label>Date</label>
+      <input id="ActivityDate" type="date">
+
+      <label>Type *</label>
+      <select id="ActivityTypeId">
+        <option value="">Loading...</option>
+      </select>
+
+      <label>Title *</label>
+      <input id="ActivityTitle" placeholder="e.g., New Music Video">
+
+      <label>Location</label>
+      <input id="ActivityLocation" placeholder="e.g., Web / Online / Manchester">
+
+      <label>Description</label>
+      <textarea id="ActivityDescription" rows="4" placeholder="Short description..."></textarea>
+
+      <label>External URL</label>
+      <input id="ActivityExternalUrl" placeholder="https://...">
+    </div>
+
+    <!-- ✅ Footer actions: Delete on left, Cancel+Save on right -->
+    <div class="modal-actions modal-actions-split">
+      <div class="modal-actions-left">
+        <button id="btnDeleteActivity" class="btn-danger hidden" type="button">
+          Delete
+        </button>
+      </div>
+
+      <div class="modal-actions-right">
+        <div id="activityStatus" class="status"></div>
+        <div class="modal-actions-buttons">
+          <button id="btnCancelActivity" class="btn-secondary" type="button">Cancel</button>
+          <button id="btnSaveActivity" class="btn-primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/activitypageEdit.js') }}"></script>
+{% endblock %}

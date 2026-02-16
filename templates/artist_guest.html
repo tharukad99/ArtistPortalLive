@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ArtiSights - Artist</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/artist_guest.css') }}">
+
+  <!-- Chart.js (for social media charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+  <input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="{{ url_for('artist_list_page') }}">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ArtiSights" class="brand-logo">
+      </a>
+
+      <div class="artist-mini">
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      {% if current_user.is_authenticated %}
+         <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+          <i class="fa-solid fa-user-shield"></i> Login
+        </a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+          <i class="fa-solid fa-user-shield"></i> Login
+        </a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="wrap">
+  <section id="card-tot" class="cardtot">
+    <!-- 1) Artist Profile -->
+    <section id="card-profile" class="card">
+      <div class="card-head">
+        <h2 class="card-title">Artist Profile</h2>
+      </div>
+
+      <div class="profile-row">
+        <img id="profile-artist-image" class="profile-avatar" src="" alt="Artist">
+
+        <div class="profile-body">
+          <div id="profile-stage-name" class="profile-title">—</div>
+          <div id="profile-full-name" class="profile-subtitle"></div>
+
+          <p id="profile-bio" class="profile-bio"></p>
+
+          <div class="profile-links">
+            <a id="profile-website" class="chip" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">
+              <i class="fa-solid fa-globe"></i> Website
+            </a>
+            <span id="profile-sources-count" class="muted"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) Latest Album -->
+    <section id="card-album" class="card">
+      <div class="card-head">
+        <h2 class="card-title">Latest Album</h2>
+      </div>
+      <div id="album-box" class="album-box"></div>
+    </section>
+
+    <!-- 3) Photo Gallery -->
+    <section id="card-photos" class="card">
+      <div class="card-head">
+        <h2 class="card-title">Photo Gallery</h2>
+      </div>
+      <div id="photo-grid" class="gallery-grid"></div>
+    </section>
+
+    <!--) Activities (GRID + Pagination) -->
+    <section id="card-activities" class="card">
+    </section>
+
+    <!-- Activities (TABLE + Pagination) -->
+    <section id="card-activities" class="card">
+      <div class="card-head">
+        <h2 class="card-title">Activities</h2>
+        <div class="muted" id="activities-count" style="display:none;"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="act-table">
+          <thead>
+            <tr>
+              <th class="col-icon">Icon</th>
+              <th>Title</th>
+              <th class="col-link">Link</th>
+              <th class="col-date">Date</th>
+            </tr>
+          </thead>
+          <tbody id="activities-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="activities-pager" class="pager" style="display:none;">
+        <button id="act-prev" class="pager-btn" type="button">Prev</button>
+        <div id="act-pages" class="pager-pages"></div>
+        <button id="act-next" class="pager-btn" type="button">Next</button>
+      </div>
+    </section>
+
+    <!--) Social Media Links -->
+    <section id="card-social" class="card">
+      <div class="card-head">
+        <h2 class="card-title">Social Links</h2>
+      </div>
+
+      <div id="social-links" class="social-links-grid"></div>
+    </section>
+
+    <!-- Empty state -->
+    <section id="empty-state" class="empty-state" style="display:none;">
+      <div class="empty-title">No public data available yet.</div>
+      <div class="empty-sub">This artist has not added public info to display.</div>
+    </section>
+
+
+</section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/artist_guest.js') }}"></script>
+</body>
+</html>

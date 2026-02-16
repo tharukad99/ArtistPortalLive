@@ -1,0 +1,142 @@
+{# =========================
+   homepageEdit.html 
+========================= #}
+{% extends "baseArtistmode.html" %}
+
+{% block page_title %}Profile{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<!-- Artist Bio -->
+<div class="card hidden" id="card-profile">
+  <div class="card-top">
+    <div class="card-title">Artist Profile</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="btnEditProfile" class="btn-primary" type="button">Update Details</button>
+    </div>
+  </div>
+
+  <div class="artist-bio-row">
+    <div class="artist-bio-left">
+      <div class="artist-bio-title" id="bio-stage-name">Loading...</div>
+      <div class="artist-bio-subtitle" id="bio-full-name"></div>
+      <div class="artist-bio-text" id="bio-text">Loading bio...</div>
+
+      <div class="artist-bio-links">
+        <a id="bio-website" class="bio-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">
+          🌐 Website
+        </a>
+        <span class="bio-meta" id="bio-sources-count"></span>
+      </div>
+    </div>
+
+    <div class="artist-bio-right" style="min-width:140px;display:flex;justify-content:flex-end;">
+      <!-- Optional image if you want later:
+      <img id="bio-profile-img"
+           src="https://via.placeholder.com/120x120?text=Artist"
+           alt="Profile"
+           style="width:120px;height:120px;object-fit:cover;border-radius:14px;border:1px solid #e5e5e5;">
+      -->
+    </div>
+  </div>
+</div>
+
+<!-- Latest Album -->
+<div class="card hidden" id="card-album">
+  <div class="card-title">Latest Album</div>
+  <div id="latest-album" class="album-box">Loading album...</div>
+</div>
+
+<!-- Photo Gallery -->
+<div class="card hidden" id="card-photos">
+  <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="card-title">Photo Gallery</div>
+    <div class="photo-actions">
+      <button id="btnAddPhoto" type="button">➕ Add Photo</button>
+      <button id="btnDeletePhoto" type="button">🗑️ Delete Photo</button>
+    </div>
+  </div>
+
+  <div id="photo-gallery" class="gallery-grid">Loading photos...</div>
+</div>
+
+<!-- Recent Activities -->
+<div class="card hidden" id="card-activities">
+  <div class="card-title">Recent Activities</div>
+  <div id="recent-activities"></div>
+</div>
+
+<!--  MODAL: Edit Profile -->
+<div id="profileModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 style="margin:0;">Edit Profile</h3>
+      <button id="btnCloseProfileModal" class="icon-btn" type="button">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <label>Stage Name *</label>
+      <input id="StageName" placeholder="Stage name">
+
+      <label>Full Name</label>
+      <input id="FullName" placeholder="Full name">
+
+      <label>Bio</label>
+      <textarea id="Bio" rows="6" placeholder="Short bio..."></textarea>
+
+      <label>Website URL</label>
+      <input id="WebsiteUrl" placeholder="https://example.com">
+
+      <label>Country</label>
+      <input id="Country" placeholder="Country">
+
+      <label>Primary Genre</label>
+      <input id="PrimaryGenre" placeholder="Genre">
+
+      <label>Profile Image URL</label>
+      <input id="ProfileImageUrl" placeholder="https://.../image.jpg">
+    </div>
+
+    <div class="modal-actions">
+      <div id="profileStatus" class="status"></div>
+      <div style="display:flex;gap:10px;">
+        <button id="btnCancelProfile" class="btn-secondary" type="button">Cancel</button>
+        <button id="btnSaveProfile" class="btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  MODAL: Add Photo  -->
+<div id="photoModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 style="margin:0;">Add Photo</h3>
+      <button id="btnClosePhotoModal" class="icon-btn" type="button">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <label>Image URL *</label>
+      <input id="PhotoUrl" placeholder="https://.../photo.jpg">
+
+      <label>Caption</label>
+      <input id="PhotoCaption" placeholder="Short caption (optional)">
+    </div>
+
+    <div class="modal-actions">
+      <div id="photoStatus" class="status"></div>
+      <div style="display:flex;gap:10px;">
+        <button id="btnCancelPhoto" class="btn-secondary" type="button">Cancel</button>
+        <button id="btnSavePhoto" class="btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/homepageEdit.js') }}"></script>
+{% endblock %}

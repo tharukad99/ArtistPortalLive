@@ -1,0 +1,176 @@
+{% extends "baseArtistmode.html" %}
+
+{% block page_title %}Social Media{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<!-- TOP ACTION BAR -->
+<div class="card-top" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+  <div style="font-size:18px;font-weight:700;"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button id="btnAddMetric" class="btn-secondary" type="button">Add Count</button>
+  </div>
+</div>
+
+<!-- Summary cards -->
+<div class="card-row">
+  <div class="card">
+    <div class="card-label">Followers</div>
+    <div class="card-value" id="followers-count">-</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Views</div>
+    <div class="card-value" id="views-count">-</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Streams</div>
+    <div class="card-value" id="streams-count">-</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Tickets</div>
+    <div class="card-value" id="tickets-count">-</div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div class="row">
+  <div class="card wide">
+    <div class="card-title">Social Media Growth</div>
+    <canvas id="growth-chart" height="150"></canvas>
+  </div>
+
+  <div class="card wide">
+    <div class="card-title">Engagement</div>
+    <canvas id="engagement-chart" height="150"></canvas>
+  </div>
+</div>
+
+<!-- METRICS EDIT GRID -->
+<div class="card">
+  <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="card-title">Metric Counts (Edit)</div>
+    <!-- <div class="muted" style="font-size:12px;">Add / Update / Delete rows (by date)</div> -->
+  </div>
+
+  <div id="metrics-rows" style="margin-top:10px;"></div>
+</div>
+
+<!-- Social links (Activities-style table) -->
+<div class="card">
+  <div class="card-top social-head">
+    <div class="card-title">Social Links</div>
+    <button id="btnAddLink" class="btn-secondary" type="button">Add Social Link</button>
+  </div>
+
+  <div class="table-wrap" style="margin-top:12px;">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th style="width:120px;">Icon</th>
+          <th>Title</th>
+          <th style="width:140px;text-align:center;">Link</th>
+          <th style="width:170px;text-align:right;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="social-links-tbody">
+        <tr><td colspan="4" class="empty">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!--  MODAL: Metric  -->
+<div id="metricModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="metricModalTitle" style="margin:0;">Add Metric Count</h3>
+      <button id="btnCloseMetricModal" class="icon-btn" type="button">✕</button>
+    </div>
+
+    <input type="hidden" id="metricRowId" value="">
+
+    <div class="form-grid">
+      <label>Metric *</label>
+      <select id="metricTypeId"></select>
+
+      <label>Platform</label>
+      <select id="metricPlatformId"></select>
+
+      <label>Date *</label>
+      <input id="metricDate" type="date">
+
+      <label>Value *</label>
+      <input id="metricValue" type="number" step="0.01" placeholder="e.g., 12000">
+    </div>
+
+    <!-- ✅ Split actions -->
+    <div class="modal-actions modal-actions-split">
+      <div class="modal-actions-left">
+        <button id="btnDeleteMetric" class="btn-danger hidden" type="button">Delete</button>
+      </div>
+
+      <div class="modal-actions-right">
+        <div id="metricStatus" class="status"></div>
+        <div class="modal-actions-buttons">
+          <button id="btnCancelMetric" class="btn-secondary" type="button">Cancel</button>
+          <button id="btnSaveMetric" class="btn-primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!--  MODAL: Social Link -->
+<div id="linkModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="linkModalTitle" style="margin:0;">Add Social Link</h3>
+      <button id="btnCloseLinkModal" class="icon-btn" type="button">✕</button>
+    </div>
+
+    <input type="hidden" id="linkRowId" value="">
+
+    <div class="form-grid">
+      <label>Source Type *</label>
+      <select id="linkSourceTypeId"></select>
+
+      <label>URL *</label>
+      <input id="linkUrl" placeholder="https://...">
+
+      <label>Handle</label>
+      <input id="linkHandle" placeholder="@artist (optional)">
+
+      <label>Display Name</label>
+      <input id="linkDisplayName" placeholder="Optional name shown in card">
+
+      <label style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+        <input id="linkIsPrimary" type="checkbox">
+        Set as Primary
+      </label>
+    </div>
+
+    <!-- ✅ Split actions -->
+    <div class="modal-actions modal-actions-split">
+      <div class="modal-actions-left">
+        <button id="btnDeleteLink" class="btn-danger hidden" type="button">Delete</button>
+      </div>
+
+      <div class="modal-actions-right">
+        <div id="linkStatus" class="status"></div>
+        <div class="modal-actions-buttons">
+          <button id="btnCancelLink" class="btn-secondary" type="button">Cancel</button>
+          <button id="btnSaveLink" class="btn-primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/social_mediaEdit.js') }}"></script>
+{% endblock %}
