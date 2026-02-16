@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - artist-portal
+name: Build and deploy Python app to Azure Web App - artist-portalv1
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       # 🛠️ Local Build Section (Optional)
       # The following section in your workflow is designed to catch build issues early on the client side, before deployment. This can be helpful for debugging and validation. However, if this step significantly increases deployment time and early detection is not critical for your workflow, you may remove this section to streamline the deployment process.
@@ -63,14 +63,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E426A67E69F74744A13D9AB3E1A1F817 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_495BBB0157D64BF783F074A7D5D2F5A6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EFB024485A52457BBEA62F0F2DFE517B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AFDB40A4E0BF4EB2A138CDCC262F6375 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_75551A6330AB44DFAC35D9289DC01B6F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A0D6350928564E27B6BF7C82F2F3F455 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'artist-portal'
+          app-name: 'artist-portalv1'
           slot-name: 'Production'
           
