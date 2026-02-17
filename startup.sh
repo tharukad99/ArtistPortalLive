@@ -28,4 +28,4 @@ apt-get install -y unixodbc-dev
 
 # Start the application using Gunicorn
 # Adjust the workers and timeout as necessary
-gunicorn --bind=0.0.0.0:8001 --timeout 600 app:app
+gunicorn --bind=0.0.0.0:8000 --timeout 600 app:app
