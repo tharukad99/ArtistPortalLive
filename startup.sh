@@ -21,7 +21,7 @@ apt-get update
 # Install the ODBC Driver 18 for SQL Server
 # 'ACCEPT_EULA=Y' accepts the end-user licensing agreement
 ACCEPT_EULA=Y apt-get install -y msodbcsql18
-ACCEPT_EULA=Y apt-get install -y msodbcsql17
+#ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
 # Install optional: unixODBC development headers (often needed for pyodbc)
 apt-get install -y unixodbc-dev
