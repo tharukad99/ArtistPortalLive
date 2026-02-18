@@ -114,9 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const created = a.dateCreated ? String(a.dateCreated).replace("T", " ").slice(0, 19) : "-";
 
       // fallback avatar if no image
-      const imgSrc = a.profileImageUrl && String(a.profileImageUrl).trim()
-        ? a.profileImageUrl
-        : "https://via.placeholder.com/80x80?text=A";
+      const hasImage = a.profileImageUrl && String(a.profileImageUrl).trim();
+      const imgSrc = hasImage ? a.profileImageUrl : "/static/img/small-logo.png";
+      // If using fallback logo (which is white), invert it to black for white background
+      const imgClass = hasImage ? "" : "inverted-icon";
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -125,8 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <a href="/edit-home/${a.id}" class="artist-link">
           <div class="artist-avatar-wrapper">
             <img src="${escapeHtml(imgSrc)}"
+                class="${imgClass}"
                 alt="${escapeHtml(a.stageName || "Artist")}"
-                onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=A';" />
+                onerror="this.onerror=null; this.src='/static/img/small-logo.png'; this.classList.add('inverted-icon');" />
           </div>
         </a>
         </td>
