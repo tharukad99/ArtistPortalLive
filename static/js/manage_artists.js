@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const id = parseInt(artistId.value || "0", 10);
-    const url = id > 0 ? `/api/artists/${id}` : "/api/artists";
+    const url = id > 0 ? `/api/artists/${id}` : "/api/artists/create";
     const method = id > 0 ? "PUT" : "POST";
 
     btnSave.disabled = true;

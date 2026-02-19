@@ -352,7 +352,7 @@ def delete_artist_photo(artist_id, photo_id):
 ########################################################################################################
 
 # ADMIN: create artist
-@artists_bp.post("")
+@artists_bp.post("/create")
 # @admin_required
 def api_create_artist():
     try:
