@@ -20,8 +20,6 @@ def list_artists():
         for r in rows
     ])
 
-
-
 @artists_bp.get("/AllArtistsList")
 def list_all_artists():
     sql = text("EXEC dbo.ListAllArtists")
@@ -42,8 +40,6 @@ def list_all_artists():
         }
         for r in rows
     ])
-
-
 
 # Get details of a specific artist
 @artists_bp.get("/<int:artist_id>")
