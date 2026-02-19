@@ -6,7 +6,7 @@ class Config:
     DEBUG = os.environ.get("FLASK_DEBUG", "True") == "True"
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
 
-    # Database configuration with environment variable overrides
+    # Database configuration with environment variable overridesaa
     # Default values are currently set to your development environment
     DB_DRIVER = os.environ.get("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
     DB_SERVER = os.environ.get("DB_SERVER", "tharukatest.database.windows.net,1433")
@@ -28,4 +28,4 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-#tesssss
+#tes
