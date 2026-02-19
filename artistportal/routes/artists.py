@@ -6,7 +6,7 @@ from sqlalchemy import text
 artists_bp = Blueprint("artists", __name__)
 
 # Get list of active artists
-@artists_bp.get("/")
+@artists_bp.get("")
 def list_artists():
     sql = text("EXEC dbo.ListActiveArtists")
     rows = db.session.execute(sql).mappings().all()
@@ -352,7 +352,7 @@ def delete_artist_photo(artist_id, photo_id):
 ########################################################################################################
 
 # ADMIN: create artist
-@artists_bp.post("/")
+@artists_bp.post("")
 # @admin_required
 def api_create_artist():
     try:
