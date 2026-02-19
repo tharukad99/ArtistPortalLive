@@ -6,7 +6,7 @@ from sqlalchemy import text
 artists_bp = Blueprint("artists", __name__)
 
 # Get list of active artists
-@artists_bp.get("")
+@artists_bp.get("/")
 def list_artists():
     sql = text("EXEC dbo.ListActiveArtists")
     rows = db.session.execute(sql).mappings().all()
@@ -219,16 +219,11 @@ def get_artist_photos(artist_id):
 
     return jsonify(result)
 
-
-
-
 from flask import request, jsonify
 from sqlalchemy import text
 
 # ---------------------------------------------------------
 # INSERT: Add a photo for an artist
-# POST /artists/<artist_id>/photos
-# Body JSON: { "url": "...", "caption": "...", "sortOrder": 1 }
 # ---------------------------------------------------------
 @artists_bp.post("/<int:artist_id>/photos")
 def insert_artist_photo(artist_id):
@@ -273,7 +268,6 @@ def insert_artist_photo(artist_id):
         "caption": caption,
         "sortOrder": sort_order
     }), 201
-
 
 # ---------------------------------------------------------
 # UPDATE: Update an existing photo row
