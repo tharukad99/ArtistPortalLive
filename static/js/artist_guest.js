@@ -46,9 +46,9 @@ async function loadProfile(artistId) {
     setImage("profile-artist-image", a.profileImageUrl);
 
     const stageName = (a.stageName || "").trim();
-    const fullName  = (a.fullName || "").trim();
-    const bio       = (a.bio || "").trim();
-    const website   = (a.websiteUrl || "").trim();
+    const fullName = (a.fullName || "").trim();
+    const bio = (a.bio || "").trim();
+    const website = (a.websiteUrl || "").trim();
     const sourcesCount = a.sourcesCount ?? 0;
 
     const hasAny = !!(stageName || fullName || bio || website || sourcesCount);
@@ -118,7 +118,7 @@ async function loadLatestAlbum(artistId) {
     }
 
     const title = escapeHtml(album.title || "Latest album");
-    const date  = album.date ? formatPrettyDate(album.date) : "";
+    const date = album.date ? formatPrettyDate(album.date) : "";
 
     box.innerHTML = `
       <div class="album-title">${title}</div>
@@ -449,7 +449,7 @@ async function loadSocialLinks(artistId) {
 function escapeHtml(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   }[m]));
 }
 
@@ -511,20 +511,20 @@ function formatPrettyDate(dateStr) {
 function formatMonth(dateStr) {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return "";
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return months[d.getUTCMonth()];
 }
 function formatNumber(n) {
   if (n == null || n === "" || Number.isNaN(Number(n))) return "-";
   const x = Number(n);
   if (x >= 1000000) return (x / 1000000).toFixed(1) + "M";
-  if (x >= 1000)    return (x / 1000).toFixed(1) + "k";
+  if (x >= 1000) return (x / 1000).toFixed(1) + "k";
   return String(x);
 }
 function escapeHtml(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   }[m]));
 }
 
@@ -651,9 +651,7 @@ function renderActivitiesPage() {
       ? `<a class="link-btn" href="${escapeAttr(act.externalUrl)}" target="_blank" rel="noopener noreferrer" title="Open link">
            <i class="fa-solid fa-arrow-up-right-from-square"></i>
          </a>`
-      : `<span class="link-btn disabled" title="No link">
-           <i class="fa-solid fa-link-slash"></i>
-         </span>`;
+      : ``;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -689,11 +687,11 @@ function renderActivitiesPage() {
   }
 }
 
-function slugType(s){
+function slugType(s) {
   return String(s)
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/(^-|-$)/g,"");
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 
@@ -707,7 +705,7 @@ function formatPrettyDate(dateStr) {
 function escapeHtml(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   }[m]));
 }
 

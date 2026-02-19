@@ -70,7 +70,8 @@
                     <!-- <input type="text" placeholder="Search" class="search-input"> -->
                     <!-- Auth section -->
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('auth.logout') }}" class="topbar-btn logout">
+                    <!-- <a href="{{ url_for('auth.logout') }}" class="topbar-btn logout"> -->
+                    <a href="{{ url_for('auth.logout', next=url_for('artist_list_page')) }}" class="topbar-btn logout">
                         <i class="fa-solid fa-right-from-bracket"></i> Logout
                     </a>
                     {% else %}

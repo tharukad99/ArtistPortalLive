@@ -61,7 +61,8 @@
         <div class="page-actions">
           <input id="searchBox" class="search" type="text" placeholder="Search by stage name..." />
           <button id="btnAdd" type="button" class="btn-primary">+ Add Artist</button>
-          <a href="/logout" class="btn-logout" id="btnLogout">Logout</a>
+          <a href="{{ url_for('auth.logout', next=url_for('artist_list_page')) }}" class="btn-logout"
+            id="btnLogout">Logout</a>
         </div>
       </div>
 
@@ -109,12 +110,12 @@
         <div class="form-grid">
           <label class="field">
             <span>Stage Name *</span>
-            <input id="stageName" type="text" placeholder="Anna Russell-Martin" />
+            <input id="stageName" type="text" placeholder="Jane" />
           </label>
 
           <label class="field">
             <span>Full Name</span>
-            <input id="fullName" type="text" placeholder="Anna Russell-Martin" />
+            <input id="fullName" type="text" placeholder="Jane Doe" />
           </label>
 
           <label class="field">

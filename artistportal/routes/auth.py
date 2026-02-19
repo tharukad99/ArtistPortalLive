@@ -36,6 +36,9 @@ def login_post():
 @auth_bp.get("/logout")
 def logout():
     logout_user()
+    next_page = request.args.get('next')
+    if next_page:
+        return redirect(next_page)
     return redirect(url_for("auth.login"))
 
 

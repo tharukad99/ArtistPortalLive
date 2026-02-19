@@ -29,7 +29,7 @@ let engagementChart = null;
 /* ---------- Helpers ---------- */
 function $(id) { return document.getElementById(id); }
 
-function setStatus(id, msg, isErr=false) {
+function setStatus(id, msg, isErr = false) {
   const el = $(id);
   if (!el) return;
   el.textContent = msg || "";
@@ -45,13 +45,13 @@ function hideEl(id) { $(id)?.classList.add("hidden"); }
 function formatNumber(n) {
   if (n == null) return "-";
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
-  if (n >= 1000)    return (n / 1000).toFixed(1) + "k";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "k";
   return n.toString();
 }
 
 function formatMonth(dateStr) {
   const d = new Date(dateStr);
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return months[d.getUTCMonth()];
 }
 
@@ -87,9 +87,9 @@ function loadSummaryCards(artistId) {
     .then(r => r.json())
     .then(data => {
       $("followers-count").textContent = formatNumber(data.followers);
-      $("views-count").textContent     = formatNumber(data.views);
-      $("streams-count").textContent   = formatNumber(data.streams);
-      $("tickets-count").textContent   = formatNumber(data.tickets);
+      $("views-count").textContent = formatNumber(data.views);
+      $("streams-count").textContent = formatNumber(data.streams);
+      $("tickets-count").textContent = formatNumber(data.tickets);
     })
     .catch(err => console.error("Error loading summary:", err));
 }
@@ -401,9 +401,9 @@ function wireMetricTableEvents(container) {
       const totalPages = Math.max(1, Math.ceil(METRIC_ROWS_CACHE.length / METRIC_PAGE_SIZE));
 
       if (action === "first") METRIC_PAGE = 1;
-      if (action === "prev")  METRIC_PAGE = Math.max(1, METRIC_PAGE - 1);
-      if (action === "next")  METRIC_PAGE = Math.min(totalPages, METRIC_PAGE + 1);
-      if (action === "last")  METRIC_PAGE = totalPages;
+      if (action === "prev") METRIC_PAGE = Math.max(1, METRIC_PAGE - 1);
+      if (action === "next") METRIC_PAGE = Math.min(totalPages, METRIC_PAGE + 1);
+      if (action === "last") METRIC_PAGE = totalPages;
 
       renderMetricTable(container);
       wireMetricTableEvents(container); // re-bind after re-render
@@ -431,21 +431,21 @@ const iconMap = {
 let SOCIAL_LINKS_CACHE = [];
 
 const socialIconMap = {
-  facebook:  { icon: "fa-brands fa-facebook-f", bg: "icon-bg-fb" },
-  spotify:   { icon: "fa-brands fa-spotify",    bg: "icon-bg-sp" },
-  instagram: { icon: "fa-brands fa-instagram",  bg: "icon-bg-ig" },
-  bandcamp:  { icon: "fa-brands fa-bandcamp",   bg: "" },
-  website:   { icon: "fa-solid fa-globe",       bg: "icon-bg-web" },
-  apple_music:{icon:"fa-brands fa-apple",       bg: "" },
-  youtube:   { icon: "fa-brands fa-youtube",    bg: "icon-bg-yt" },
-  emubands:  { icon: "fa-solid fa-music",       bg: "" },
-  bbc_sounds:{ icon: "fa-solid fa-radio",       bg: "" },
-  acast:     { icon: "fa-solid fa-podcast",     bg: "" },
-  twitter_x: { icon: "fa-brands fa-x-twitter",  bg: "" }
+  facebook: { icon: "fa-brands fa-facebook-f", bg: "icon-bg-fb" },
+  spotify: { icon: "fa-brands fa-spotify", bg: "icon-bg-sp" },
+  instagram: { icon: "fa-brands fa-instagram", bg: "icon-bg-ig" },
+  bandcamp: { icon: "fa-brands fa-bandcamp", bg: "" },
+  website: { icon: "fa-solid fa-globe", bg: "icon-bg-web" },
+  apple_music: { icon: "fa-brands fa-apple", bg: "" },
+  youtube: { icon: "fa-brands fa-youtube", bg: "icon-bg-yt" },
+  emubands: { icon: "fa-solid fa-music", bg: "" },
+  bbc_sounds: { icon: "fa-solid fa-radio", bg: "" },
+  acast: { icon: "fa-solid fa-podcast", bg: "" },
+  twitter_x: { icon: "fa-brands fa-x-twitter", bg: "" }
 };
 
-function platformClassFromCode(code){
-  switch(code){
+function platformClassFromCode(code) {
+  switch (code) {
     case "youtube": return "platform-youtube";
     case "instagram": return "platform-instagram";
     case "facebook": return "platform-facebook";
@@ -465,14 +465,14 @@ async function loadSocialLinksEditable(artistId) {
   const tbody = document.getElementById("social-links-tbody");
   if (!tbody) return;
 
-  tbody.innerHTML = `<tr><td colspan="4" class="empty">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="3" class="empty">Loading...</td></tr>`;
 
   const res = await fetch(`/api/sources/${artistId}/sources`);
   const items = await res.json();
   SOCIAL_LINKS_CACHE = items || [];
 
   if (!items || items.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty">No social links found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="empty">No social links found.</td></tr>`;
     return;
   }
 
@@ -517,17 +517,12 @@ function socialRowHtml(x) {
       <td>
         <div class="row-title">${title}</div>
         <div class="row-sub">${sub}</div>
-        ${primary}
-      </td>
-
-      <td style="text-align:center;">
-        <button type="button" class="round-btn" data-open-link="${safeUrl}" title="Open link">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </button>
-      </td>
-
       <td>
-        <div class="actions-right">
+        <div class="actions-right" style="display:flex;justify-content:flex-end;gap:8px;">
+          ${x.url ? `
+          <button type="button" class="round-btn" data-open-link="${safeUrl}" title="Open link">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </button>` : ""}
           <button type="button" class="round-btn" data-edit-link="${x.artistSourceId}" title="Update">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>

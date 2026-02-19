@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,18 +12,19 @@
 <body>
 
   <!-- Top right login -->
-  <a href="/login" class="login-btn">Login</a>
+  <!-- Top right login/logout -->
+  {% if current_user.is_authenticated %}
+  <a href="{{ url_for('auth.logout', next=request.path) }}" class="login-btn">Logout</a>
+  {% else %}
+  <a href="{{ url_for('auth.login') }}" class="login-btn">Login</a>
+  {% endif %}
 
   <!-- Centered content area -->
   <main class="page">
 
     <!-- Logo + tagline -->
     <div class="hero">
-      <img
-        class="hero-logo"
-        src="{{ url_for('static', filename='img/logo.png') }}"
-        alt="ArtiSights"
-      />
+      <img class="hero-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="ArtiSights" />
       <div class="hero-tag">@ARTISIGHT • Artist Intelligence</div>
     </div>
 
@@ -58,4 +60,5 @@
 
   <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
 </body>
+
 </html>
