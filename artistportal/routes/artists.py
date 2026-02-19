@@ -355,89 +355,104 @@ def delete_artist_photo(artist_id, photo_id):
 @artists_bp.post("/")
 # @admin_required
 def api_create_artist():
-    data = request.get_json(silent=True) or {}
+    try:
+        data = request.get_json(silent=True) or {}
 
-    stage_name = (data.get("stageName") or "").strip()
-    if not stage_name:
-        return jsonify({"success": False, "message": "stageName is required"}), 400
+        stage_name = (data.get("stageName") or "").strip()
+        if not stage_name:
+            return jsonify({"success": False, "message": "stageName is required"}), 400
 
-    params = {
-        "ArtistId": 0,
-        "StageName": stage_name,
-        "FullName": (data.get("fullName") or "").strip() or None,
-        "Bio": (data.get("bio") or "").strip() or None,
-        "ProfileImageUrl": (data.get("profileImageUrl") or "").strip() or None,
-        "Country": (data.get("country") or "").strip() or None,
-        "PrimaryGenre": (data.get("primaryGenre") or "").strip() or None,
-        "WebsiteUrl": (data.get("websiteUrl") or "").strip() or None,
-        "IsActive": 1 if bool(data.get("isActive", True)) else 0,
-    }
+        params = {
+            "ArtistId": 0,
+            "StageName": stage_name,
+            "FullName": (data.get("fullName") or "").strip() or None,
+            "Bio": (data.get("bio") or "").strip() or None,
+            "ProfileImageUrl": (data.get("profileImageUrl") or "").strip() or None,
+            "Country": (data.get("country") or "").strip() or None,
+            "PrimaryGenre": (data.get("primaryGenre") or "").strip() or None,
+            "WebsiteUrl": (data.get("websiteUrl") or "").strip() or None,
+            "IsActive": 1 if bool(data.get("isActive", True)) else 0,
+        }
 
-    row = db.session.execute(
-        text("""
-            EXEC dbo.UpsertArtist
-                @ArtistId=:ArtistId,
-                @StageName=:StageName,
-                @FullName=:FullName,
-                @Bio=:Bio,
-                @ProfileImageUrl=:ProfileImageUrl,
-                @Country=:Country,
-                @PrimaryGenre=:PrimaryGenre,
-                @WebsiteUrl=:WebsiteUrl,
-                @IsActive=:IsActive
-        """),
-        params
-    ).mappings().first()
+        row = db.session.execute(
+            text("""
+                SET NOCOUNT ON;
+                EXEC dbo.UpsertArtist
+                    @ArtistId=:ArtistId,
+                    @StageName=:StageName,
+                    @FullName=:FullName,
+                    @Bio=:Bio,
+                    @ProfileImageUrl=:ProfileImageUrl,
+                    @Country=:Country,
+                    @PrimaryGenre=:PrimaryGenre,
+                    @WebsiteUrl=:WebsiteUrl,
+                    @IsActive=:IsActive
+            """),
+            params
+        ).mappings().first()
 
-    db.session.commit()
-    return jsonify({"success": True, "artistId": int(row["ArtistId"])}), 201
+        db.session.commit()
+        
+        if not row:
+            return jsonify({"success": False, "message": "Database did not return a new ArtistId."}), 500
+
+        return jsonify({"success": True, "artistId": int(row["ArtistId"])}), 201
+
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(ex)}), 500
 
 
 # ADMIN: update artist
 @artists_bp.put("/<int:artist_id>")
 # @admin_required
 def api_update_artist(artist_id: int):
-    data = request.get_json(silent=True) or {}
+    try:
+        data = request.get_json(silent=True) or {}
 
-    stage_name = (data.get("stageName") or "").strip()
-    if not stage_name:
-        return jsonify({"success": False, "message": "stageName is required"}), 400
+        stage_name = (data.get("stageName") or "").strip()
+        if not stage_name:
+            return jsonify({"success": False, "message": "stageName is required"}), 400
 
-    params = {
-        "ArtistId": artist_id,
-        "StageName": stage_name,
-        "FullName": (data.get("fullName") or "").strip() or None,
-        "Bio": (data.get("bio") or "").strip() or None,
-        "ProfileImageUrl": (data.get("profileImageUrl") or "").strip() or None,
-        "Country": (data.get("country") or "").strip() or None,
-        "PrimaryGenre": (data.get("primaryGenre") or "").strip() or None,
-        "WebsiteUrl": (data.get("websiteUrl") or "").strip() or None,
-        "IsActive": 1 if bool(data.get("isActive", True)) else 0,
-    }
+        params = {
+            "ArtistId": artist_id,
+            "StageName": stage_name,
+            "FullName": (data.get("fullName") or "").strip() or None,
+            "Bio": (data.get("bio") or "").strip() or None,
+            "ProfileImageUrl": (data.get("profileImageUrl") or "").strip() or None,
+            "Country": (data.get("country") or "").strip() or None,
+            "PrimaryGenre": (data.get("primaryGenre") or "").strip() or None,
+            "WebsiteUrl": (data.get("websiteUrl") or "").strip() or None,
+            "IsActive": 1 if bool(data.get("isActive", True)) else 0,
+        }
 
-    row = db.session.execute(
-        text("""
-            EXEC dbo.UpsertArtist
-                @ArtistId=:ArtistId,
-                @StageName=:StageName,
-                @FullName=:FullName,
-                @Bio=:Bio,
-                @ProfileImageUrl=:ProfileImageUrl,
-                @Country=:Country,
-                @PrimaryGenre=:PrimaryGenre,
-                @WebsiteUrl=:WebsiteUrl,
-                @IsActive=:IsActive
-        """),
-        params
-    ).mappings().first()
+        row = db.session.execute(
+            text("""
+                SET NOCOUNT ON;
+                EXEC dbo.UpsertArtist
+                    @ArtistId=:ArtistId,
+                    @StageName=:StageName,
+                    @FullName=:FullName,
+                    @Bio=:Bio,
+                    @ProfileImageUrl=:ProfileImageUrl,
+                    @Country=:Country,
+                    @PrimaryGenre=:PrimaryGenre,
+                    @WebsiteUrl=:WebsiteUrl,
+                    @IsActive=:IsActive
+            """),
+            params
+        ).mappings().first()
 
-    db.session.commit()
-    return jsonify({"success": True, "artistId": int(row["ArtistId"])})
+        db.session.commit()
+        
+        if not row:
+             return jsonify({"success": False, "message": "Database update failed (no ID returned)."}), 500
 
+        return jsonify({"success": True, "artistId": int(row["ArtistId"])})
 
-from flask import Blueprint, jsonify, request
-from sqlalchemy import text
-from ..extensions import db
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(ex)}), 500
 # ---------------------------------------------------------
 # ADMIN: HARD delete artist
 # DELETE /api/artists/<artist_id>
