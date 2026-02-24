@@ -7,7 +7,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
 
     # Database configuration with environment variable overrides
-    # Default values are currently set to your development environments
+    # Default values are currently set to your development environment
     DB_DRIVER = os.environ.get("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
     DB_SERVER = os.environ.get("DB_SERVER", "tharukatest.database.windows.net,1433")
     DB_DATABASE = os.environ.get("DB_DATABASE", "ARTISTSPORTALDB")
