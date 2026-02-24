@@ -14,7 +14,7 @@ class Config:
     DB_USER = os.environ.get("DB_USER", "tharuka")
     DB_PASSWORD = os.environ.get("DB_PASSWORD", "Dilshan6116")
 
-    # Construct the connection string
+    # Construct the connection strin
     params = urllib.parse.quote_plus(
         f"DRIVER={DB_DRIVER};"
         f"SERVER={DB_SERVER};"
