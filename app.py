@@ -77,7 +77,7 @@ def manage_activities_page(artist_id):
     return render_template("login.html")
 
 @login_required
-@app.route("/edit-Socialmedia/<int:artist_id>")
+@app.route("/socialmedia/<int:artist_id>")
 def manage_social_media_page(artist_id):
     if (getattr(current_user, "Role", 0)) == 2:
         return render_template("social_mediaEdit.html", artist_id=artist_id)
