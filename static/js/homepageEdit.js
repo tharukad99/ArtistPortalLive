@@ -260,6 +260,25 @@ function loadLatestAlbumFromActivities(artistId) {
     });
 }
 
+const activityIconMap = {
+  "concert": "fa-solid fa-microphone-lines",
+  "album": "fa-solid fa-compact-disc",
+  "video": "fa-brands fa-youtube",
+  "spotify": "fa-brands fa-spotify",
+  "tour": "fa-solid fa-route",
+  "press": "fa-regular fa-newspaper",
+  "campaign": "fa-solid fa-bullhorn",
+  "podcast": "fa-solid fa-podcast"
+};
+
+function getIconForActivity(type, title) {
+  const combined = ((type || "") + " " + (title || "")).toLowerCase();
+  for (const [key, icon] of Object.entries(activityIconMap)) {
+    if (combined.includes(key)) return icon;
+  }
+  return "fa-solid fa-bolt"; // Fallback
+}
+
 function loadRecentActivities(artistId) {
   fetch(`/api/activities/artist/${artistId}`)
     .then(r => r.json())
@@ -281,11 +300,31 @@ function loadRecentActivities(artistId) {
       items.slice(0, 8).forEach(act => {
         const row = document.createElement("div");
         row.className = "activity-item";
+        row.style.padding = "12px 0";
 
+        // Left section with icon and title
         const left = document.createElement("div");
-        left.textContent = act.title;
+        left.style.display = "flex";
+        left.style.alignItems = "center";
+        left.style.gap = "14px";
+
+        const iconClass = getIconForActivity(act.type, act.title);
+        const icon = document.createElement("i");
+        icon.className = iconClass;
+        icon.style.width = "20px";
+        icon.style.textAlign = "center";
+        icon.style.color = "#6366f1"; // Indigo/Blue icon color
+        icon.style.fontSize = "16px";
+
+        const title = document.createElement("span");
+        title.style.fontWeight = "500";
+        title.textContent = act.title;
+
+        left.appendChild(icon);
+        left.appendChild(title);
 
         const right = document.createElement("div");
+        right.style.color = "#9ca3af"; // Gray date color
         right.textContent = formatPrettyDate(act.date);
 
         row.appendChild(left);
@@ -298,6 +337,7 @@ function loadRecentActivities(artistId) {
       hideCard("card-activities");
     });
 }
+
 
 /* =============================
    PHOTO Gallery Insert/Delete
@@ -316,7 +356,7 @@ function loadPhotoGallery(artistId) {
 
       if (!images || images.length === 0) {
         // hideCard("card-photos");
-         showCard("card-photos");
+        showCard("card-photos");
         return;
       }
 

@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSummaryCards(artistId);
     loadGrowthChart(artistId);
     loadEngagementChart(artistId);
-    loadRecentActivities(artistId);
 });
+
 
 /* ---------- Social Links ---------- */
 const iconMap = {
@@ -94,23 +94,51 @@ function loadSummaryCards(artistId) {
     fetch(`/api/metrics/summary/${artistId}`)
         .then(r => r.json())
         .then(data => {
-            document.getElementById("followers-count").textContent = formatNumber(data.followers);
-            document.getElementById("views-count").textContent     = formatNumber(data.views);
-            document.getElementById("streams-count").textContent   = formatNumber(data.streams);
-            document.getElementById("tickets-count").textContent   = formatNumber(data.tickets);
+            const followers = Number(data.followers || 0);
+            const views = Number(data.views || 0);
+            const streams = Number(data.streams || 0);
+            const totalReach = followers + views + streams;
+
+            const trObj = document.getElementById("total-reach-count");
+            if (trObj) trObj.textContent = totalReach.toLocaleString();
+
+            const fObj = document.getElementById("followers-count");
+            if (fObj) fObj.textContent = followers.toLocaleString();
+
+            const vObj = document.getElementById("views-count");
+            if (vObj) vObj.textContent = views.toLocaleString();
+
+            const sObj = document.getElementById("streams-count");
+            if (sObj) sObj.textContent = streams.toLocaleString();
         })
         .catch(err => console.error("Error loading summary:", err));
 }
 
+
 /* Load growth chart data */
 function loadGrowthChart(artistId) {
-    fetch(`/api/metrics/timeseries/${artistId}?metric=followers`)
+    fetch(`/api/metrics/rows/${artistId}`)
         .then(r => r.json())
-        .then(points => {
-            const labels = points.map(p => formatMonth(p.date));
-            const values = points.map(p => p.value);
+        .then(rows => {
+            // 1. Filter for Followers (MetricTypeId 1)
+            const followerRows = rows.filter(r => r.metricTypeId === 1);
 
-            const ctx = document.getElementById("growth-chart").getContext("2d");
+            // 2. Group by Date and Sum values
+            const dailyTotals = {};
+            followerRows.forEach(r => {
+                const d = r.metricDate;
+                if (!dailyTotals[d]) dailyTotals[d] = 0;
+                dailyTotals[d] += Number(r.value || 0);
+            });
+
+            // 3. Sort dates and get values
+            const sortedDates = Object.keys(dailyTotals).sort();
+            const labels = sortedDates.map(d => formatMonth(d));
+            const values = sortedDates.map(d => dailyTotals[d]);
+
+            const chartEl = document.getElementById("growth-chart");
+            if (!chartEl) return;
+            const ctx = chartEl.getContext("2d");
 
             if (growthChart) growthChart.destroy();
 
@@ -119,25 +147,41 @@ function loadGrowthChart(artistId) {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "Followers",
+                        label: "Total Followers",
                         data: values,
-                        fill: false,
-                        borderColor: "#3b82f6",
-                        borderWidth: 2,
-                        tension: 0.3,
-                        pointRadius: 3
+                        fill: true,
+                        borderColor: "#2458d3",
+                        backgroundColor: "rgba(36, 88, 211, 0.1)",
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: "#2458d3"
                     }]
                 },
                 options: {
-                    plugins: { legend: { display: false } },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return "Total: " + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: false, grid: { color: "rgba(0,0,0,0.05)" } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
+
         })
-        .catch(err => console.error("Error loading growth chart:", err));
+        .catch(err => console.error("Error loading total growth chart:", err));
 }
+
 
 // For engagement chart we’ll call your timeseries endpoint three times
 function loadEngagementChart(artistId) {
@@ -162,7 +206,10 @@ function loadEngagementChart(artistId) {
             });
         });
 
-        const ctx = document.getElementById("engagement-chart").getContext("2d");
+        const chartEl = document.getElementById("engagement-chart");
+        if (!chartEl) return;
+        const ctx = chartEl.getContext("2d");
+
         if (engagementChart) engagementChart.destroy();
 
         engagementChart = new Chart(ctx, {
@@ -189,13 +236,13 @@ function loadEngagementChart(artistId) {
 function formatNumber(n) {
     if (n == null) return "-";
     if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
-    if (n >= 1000)    return (n / 1000).toFixed(1) + "k";
+    if (n >= 1000) return (n / 1000).toFixed(1) + "k";
     return n.toString();
 }
 
 function formatMonth(dateStr) {
     const d = new Date(dateStr);
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return months[d.getUTCMonth()];
 }
 

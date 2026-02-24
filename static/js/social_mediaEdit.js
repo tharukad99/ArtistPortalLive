@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("btnAddMetric")?.addEventListener("click", () => openMetricModalForCreate());
   document.getElementById("btnAddLink")?.addEventListener("click", () => openLinkModalForCreate());
+  document.getElementById("btnExecuteScrape")?.addEventListener("click", () => handleExecuteScrape(artistId));
+
 
   wireMetricModal(artistId);
   wireLinkModal(artistId);
@@ -86,35 +88,85 @@ function loadSummaryCards(artistId) {
   return fetch(`/api/metrics/summary/${artistId}`)
     .then(r => r.json())
     .then(data => {
-      $("followers-count").textContent = formatNumber(data.followers);
-      $("views-count").textContent = formatNumber(data.views);
-      $("streams-count").textContent = formatNumber(data.streams);
-      $("tickets-count").textContent = formatNumber(data.tickets);
+      const followers = Number(data.followers || 0);
+      const views = Number(data.views || 0);
+      const streams = Number(data.streams || 0);
+      const totalReach = followers + views + streams;
+
+      if ($("total-reach-count")) $("total-reach-count").textContent = totalReach.toLocaleString();
+      if ($("followers-count")) $("followers-count").textContent = followers.toLocaleString();
+      if ($("views-count")) $("views-count").textContent = views.toLocaleString();
+      if ($("streams-count")) $("streams-count").textContent = streams.toLocaleString();
     })
     .catch(err => console.error("Error loading summary:", err));
 }
 
 function loadGrowthChart(artistId) {
-  return fetch(`/api/metrics/timeseries/${artistId}?metric=followers`)
+  return fetch(`/api/metrics/rows/${artistId}`)
     .then(r => r.json())
-    .then(points => {
-      const labels = points.map(p => formatMonth(p.date));
-      const values = points.map(p => p.value);
+    .then(rows => {
+      // 1. Filter for Followers (MetricTypeId 1)
+      const followerRows = rows.filter(r => r.metricTypeId === 1);
 
-      const ctx = $("growth-chart").getContext("2d");
+      // 2. Group by Date and Sum values
+      const dailyTotals = {};
+      followerRows.forEach(r => {
+        const d = r.metricDate;
+        if (!dailyTotals[d]) dailyTotals[d] = 0;
+        dailyTotals[d] += Number(r.value || 0);
+      });
+
+      // 3. Sort dates and get values
+      const sortedDates = Object.keys(dailyTotals).sort();
+      const labels = sortedDates.map(d => formatMonth(d));
+      const values = sortedDates.map(d => dailyTotals[d]);
+
+      const chartEl = $("growth-chart");
+      if (!chartEl) return;
+      const ctx = chartEl.getContext("2d");
+
       if (growthChart) growthChart.destroy();
 
       growthChart = new Chart(ctx, {
         type: "line",
         data: {
           labels,
-          datasets: [{ label: "Followers", data: values, fill: false, borderWidth: 2, tension: 0.3, pointRadius: 3 }]
+          datasets: [{
+            label: "Total Followers",
+            data: values,
+            fill: true,
+            borderColor: "#2458d3",
+            backgroundColor: "rgba(36, 88, 211, 0.1)",
+            borderWidth: 3,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: "#2458d3"
+          }]
         },
-        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return "Total: " + context.parsed.y.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: false, grid: { color: "rgba(0,0,0,0.05)" } },
+            x: { grid: { display: false } }
+          }
+        }
       });
     })
-    .catch(err => console.error("Error loading growth chart:", err));
+    .catch(err => console.error("Error loading total growth chart:", err));
 }
+
+
 
 function loadEngagementChart(artistId) {
   const metrics = ["likes", "comments", "shares"];
@@ -126,7 +178,10 @@ function loadEngagementChart(artistId) {
         data: series.map(p => p.value)
       }));
 
-      const ctx = $("engagement-chart").getContext("2d");
+      const chartEl = $("engagement-chart");
+      if (!chartEl) return;
+      const ctx = chartEl.getContext("2d");
+
       if (engagementChart) engagementChart.destroy();
 
       engagementChart = new Chart(ctx, {
@@ -650,5 +705,47 @@ async function deleteLink(artistId, artistSourceId) {
   } catch (e) {
     console.error(e);
     alert("Delete failed (network/server).");
+  }
+}
+
+async function handleExecuteScrape(artistId) {
+  const btn = $("btnExecuteScrape");
+  if (!btn || btn.disabled) return;
+
+  if (!confirm("This will attempt to fetch latest follower counts from Instagram and Facebook. Continue?")) return;
+
+  const originalText = btn.textContent;
+  btn.textContent = "Executing...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/metrics/scrape/${artistId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include"
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Execution failed.");
+    } else {
+      let msg = data.message;
+      if (data.details && data.details.length > 0) {
+        msg += "\n\nResults:";
+        data.details.forEach(d => {
+          msg += `\n- ${d.platform}: ${d.count.toLocaleString()} followers`;
+        });
+      }
+      alert(msg);
+      // Refresh the page data
+      await refreshDashboard(artistId);
+      await loadMetricRows(artistId);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Execution failed (network/server error).");
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
   }
 }

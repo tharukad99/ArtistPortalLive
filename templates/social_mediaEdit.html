@@ -9,42 +9,54 @@
 <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
   <div style="font-size:18px;font-weight:700;"></div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button id="btnExecuteScrape" class="btn-primary" type="button">Execute</button>
     <button id="btnAddMetric" class="btn-secondary" type="button">Add Count</button>
+  </div>
+
+</div>
+
+<!-- Summary Dashboard -->
+<div class="card-row">
+  <div class="card" style="background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: white;">
+    <div class="card-label" style="color: #9ca3af;">Total Reach</div>
+    <div class="card-value" id="total-reach-count">-</div>
+    <div class="card-sub" style="color: #4b5563;">Followers + Views + Streams</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Overall Followers</div>
+    <div class="card-value" id="followers-count">-</div>
+    <div class="card-sub">Latest across all platforms</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Total Views</div>
+    <div class="card-value" id="views-count">-</div>
+    <div class="card-sub">Video & Social content</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Total Streams</div>
+    <div class="card-value" id="streams-count">-</div>
+    <div class="card-sub">Audio platforms</div>
   </div>
 </div>
 
-<!-- Summary cards -->
-<div class="card-row">
-  <div class="card">
-    <div class="card-label">Followers</div>
-    <div class="card-value" id="followers-count">-</div>
-  </div>
-  <div class="card">
-    <div class="card-label">Views</div>
-    <div class="card-value" id="views-count">-</div>
-  </div>
-  <div class="card">
-    <div class="card-label">Streams</div>
-    <div class="card-value" id="streams-count">-</div>
-  </div>
-  <div class="card">
-    <div class="card-label">Tickets</div>
-    <div class="card-value" id="tickets-count">-</div>
-  </div>
-</div>
 
 <!-- Charts row -->
 <div class="row">
   <div class="card wide">
     <div class="card-title">Social Media Growth</div>
-    <canvas id="growth-chart" height="150"></canvas>
+    <div style="height: 300px; position: relative;">
+      <canvas id="growth-chart"></canvas>
+    </div>
   </div>
 
   <div class="card wide">
     <div class="card-title">Engagement</div>
-    <canvas id="engagement-chart" height="150"></canvas>
+    <div style="height: 300px; position: relative;">
+      <canvas id="engagement-chart"></canvas>
+    </div>
   </div>
 </div>
+
 
 <!-- METRICS EDIT GRID -->
 <div class="card">

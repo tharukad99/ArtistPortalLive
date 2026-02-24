@@ -1,0 +1,69 @@
+{% extends "baseArtistmode.html" %}
+
+{% block page_title %}Followers History{% endblock %}
+
+{% block content %}
+<input type="hidden" id="artist-id" value="{{ artist_id }}">
+
+<!-- Summary cards -->
+<div class="card-row">
+    <div class="card">
+        <div class="card-label">Total Followers</div>
+        <div class="card-value" id="total-followers-count">-</div>
+        <div class="card-sub">Sum of all platforms</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Instagram</div>
+        <div class="card-value" id="insta-followers-count">-</div>
+        <div class="card-sub" id="insta-last-updated">Never</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Facebook</div>
+        <div class="card-value" id="fb-followers-count">-</div>
+        <div class="card-sub" id="fb-last-updated">Never</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Spotify/Other</div>
+        <div class="card-value" id="other-followers-count">-</div>
+        <div class="card-sub" id="other-last-updated">Never</div>
+    </div>
+</div>
+
+<!-- Growth Chart -->
+<!-- <div class="card" style="margin-bottom: 20px;">
+    <div class="card-title">Social Media Growth (Total)</div>
+    <div style="height: 300px; position: relative;">
+        <canvas id="growthChart"></canvas>
+    </div>
+</div> -->
+
+
+<!-- History Table -->
+<div class="card">
+    <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-title">Follower History</div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:12px;">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Platform</th>
+                    <th style="text-align:right;">Count</th>
+                </tr>
+            </thead>
+            <tbody id="follower-history-tbody">
+                <tr>
+                    <td colspan="3" class="empty">Loading history...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/followersEdit.js') }}"></script>
+{% endblock %}

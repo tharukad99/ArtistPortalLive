@@ -170,3 +170,16 @@ class ArtistMetric(db.Model):
 
     metric_type = db.relationship("MetricType")
     platform = db.relationship("Platform")
+
+
+class MasterUserName(db.Model):
+    __tablename__ = "MasterUserName"
+
+    id = db.Column(db.Integer, primary_key=True)
+    artistid = db.Column(db.Integer, db.ForeignKey("Artists.ArtistId"), nullable=False, unique=True)
+    fb_username = db.Column(db.String(255))
+    insta_username = db.Column(db.String(255))
+    createdate = db.Column(db.DateTime, default=datetime.utcnow)
+
+    artist = db.relationship("Artist", backref=db.backref("master_username", uselist=False))
+

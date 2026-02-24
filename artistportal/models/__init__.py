@@ -7,5 +7,6 @@ from .models import (
     Activity,
     MetricType,
     Platform,
-    ArtistMetric
+    ArtistMetric,
+    MasterUserName
 )

@@ -1,10 +1,64 @@
 # artistportal/routes/metrics.py
 from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy import func, text
+from datetime import datetime
 from ..extensions import db
-from ..models import ArtistMetric, MetricType
+from ..models import ArtistMetric, MetricType, MasterUserName
+from ..utils.scraper import SocialScraper
 
 metrics_bp = Blueprint("metrics", __name__)
+
+# -----------------------------
+# NEW: Scrape and Update Metrics
+# POST /api/metrics/scrape/<artist_id>
+# -----------------------------
+@metrics_bp.post("/scrape/<int:artist_id>")
+def scrape_social_metrics(artist_id):
+    try:
+        # 1. Get Usernames from MasterUserName
+        master = MasterUserName.query.filter_by(artistid=artist_id).first()
+        if not master:
+            return jsonify({"error": "No social handles found in MasterUserName for this artist"}), 404
+
+        scraper = SocialScraper()
+        results = []
+
+        # 2. Scrape Instagram
+        if master.insta_username:
+            count = scraper.get_instagram_followers(master.insta_username)
+            if count is not None:
+                # MetricTypeId=1 (Followers), PlatformId=4 (Instagram)
+                db.session.execute(
+                    text("EXEC dbo.usp_InsertArtistMetricRow @ArtistId=:aid, @MetricTypeId=1, @PlatformId=4, @MetricDate=:dt, @Value=:val"),
+                    {"aid": artist_id, "dt": datetime.utcnow().date(), "val": count}
+                )
+                results.append({"platform": "Instagram", "count": count})
+
+        # 3. Scrape Facebook
+        if master.fb_username:
+            count = scraper.get_facebook_followers(master.fb_username)
+            if count is not None:
+                # MetricTypeId=1 (Followers), PlatformId=2 (Facebook)
+                db.session.execute(
+                    text("EXEC dbo.usp_InsertArtistMetricRow @ArtistId=:aid, @MetricTypeId=1, @PlatformId=2, @MetricDate=:dt, @Value=:val"),
+                    {"aid": artist_id, "dt": datetime.utcnow().date(), "val": count}
+                )
+                results.append({"platform": "Facebook", "count": count})
+
+
+
+
+        if not results:
+            return jsonify({"message": "Scraping completed but no new data was found."}), 200
+
+        db.session.commit()
+        return jsonify({"message": "Metrics updated successfully", "details": results}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception("Error in scrape_social_metrics")
+        return jsonify({"error": str(e)}), 500
+
 
 # Summary Metrics Endpoint
 @metrics_bp.get("/summary/<int:artist_id>")

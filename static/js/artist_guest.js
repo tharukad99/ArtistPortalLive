@@ -180,15 +180,24 @@ async function loadPhotos(artistId) {
    4) ACTIVITIES GRID
 ========================= */
 const activityIconMap = {
-  "Concert": "fa-solid fa-music",
-  "Video Uploaded": "fa-brands fa-youtube",
-  "Google Campaign": "fa-brands fa-google",
-  "New Album": "fa-solid fa-compact-disc",
-  "Podcast Release": "fa-solid fa-podcast",
-  "Spotify Release": "fa-brands fa-spotify",
-  "Tour": "fa-solid fa-ticket",
-  "Press": "fa-regular fa-newspaper",
+  "concert": "fa-solid fa-microphone-lines",
+  "album": "fa-solid fa-compact-disc",
+  "video": "fa-brands fa-youtube",
+  "spotify": "fa-brands fa-spotify",
+  "tour": "fa-solid fa-route",
+  "press": "fa-regular fa-newspaper",
+  "campaign": "fa-solid fa-bullhorn",
+  "podcast": "fa-solid fa-podcast"
 };
+
+function getIconForActivity(type, title) {
+  const combined = ((type || "") + " " + (title || "")).toLowerCase();
+  for (const [key, icon] of Object.entries(activityIconMap)) {
+    if (combined.includes(key)) return icon;
+  }
+  return "fa-solid fa-bolt";
+}
+
 
 async function loadActivitiesGrid(artistId) {
   const cardId = "card-activities";
@@ -225,8 +234,9 @@ async function loadActivitiesGrid(artistId) {
       iconWrap.className = "activity-icon";
 
       const icon = document.createElement("i");
-      icon.className = activityIconMap[type] || "fa-solid fa-bolt";
+      icon.className = getIconForActivity(type, title);
       iconWrap.appendChild(icon);
+
 
       // text block
       const body = document.createElement("div");
@@ -643,8 +653,9 @@ function renderActivitiesPage() {
   tbody.innerHTML = "";
 
   slice.forEach(act => {
-    const iconClass = activityIconMap[act.type] || "fa-solid fa-bolt";
+    const iconClass = getIconForActivity(act.type, act.title);
     const typeClass = "t-" + slugType(act.type || "other");
+
     const dateText = act.date ? formatPrettyDate(act.date) : "";
 
     const linkHtml = act.externalUrl

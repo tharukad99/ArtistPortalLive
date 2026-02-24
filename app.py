@@ -42,6 +42,12 @@ def activities_page(artist_id):
 def social_media_page(artist_id):
     return render_template("social_media.html", artist_id=artist_id)
 
+# Followers page for that artist
+@app.route("/artist/<int:artist_id>/followers")
+def followers_page(artist_id):
+    return render_template("followers.html", artist_id=artist_id)
+
+
 # Manage Artists pages by admin only
 @app.route("/admin/manage-each-artists")
 @login_required
@@ -70,7 +76,6 @@ def manage_activities_page(artist_id):
         return render_template("activitypageEdit.html", artist_id=artist_id)
     return render_template("login.html")
 
-# Manage Artists Social Media page by admin or artist
 @login_required
 @app.route("/edit-Socialmedia/<int:artist_id>")
 def manage_social_media_page(artist_id):
@@ -78,6 +83,16 @@ def manage_social_media_page(artist_id):
         return render_template("social_mediaEdit.html", artist_id=artist_id)
     elif int(getattr(current_user, "IsAdmin", 0)) == 1:
         return render_template("social_mediaEdit.html", artist_id=artist_id)
+    return render_template("login.html")
+
+# Manage Artists Followers page by admin or artist
+@login_required
+@app.route("/edit-followers/<int:artist_id>")
+def manage_followers_page(artist_id):
+    if (getattr(current_user, "Role", 0)) == 2:
+        return render_template("followersEdit.html", artist_id=artist_id)
+    elif int(getattr(current_user, "IsAdmin", 0)) == 1:
+        return render_template("followersEdit.html", artist_id=artist_id)
     return render_template("login.html")
 
 @app.errorhandler(403)
