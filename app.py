@@ -87,7 +87,7 @@ def manage_social_media_page(artist_id):
 
 # Manage Artists Followers page by admin or artist
 @login_required
-@app.route("/edit-followers/<int:artist_id>")
+@app.route("/fullsocialmedia/<int:artist_id>")
 def manage_followers_page(artist_id):
     if (getattr(current_user, "Role", 0)) == 2:
         return render_template("followersEdit.html", artist_id=artist_id)

@@ -4,3 +4,5 @@ pyodbc
 gunicorn
 Flask-Login
 Flask-Cors
+requests
+beautifulsoup4

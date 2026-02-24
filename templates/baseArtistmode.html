@@ -47,14 +47,16 @@
                 </a>
 
                 <a href="{{ url_for('manage_social_media_page', artist_id=artist_id) }}"
-                    class="nav-item {% if '/social' in request.path %}active{% endif %}">
+                    class="nav-item {% if '/socialmedia' in request.path %}active{% endif %}">
                     <span>Social Media</span>
                 </a>
 
+
                 <a href="{{ url_for('manage_followers_page', artist_id=artist_id) }}"
-                    class="nav-item {% if '/followers' in request.path %}active{% endif %}">
+                    class="nav-item {% if '/fullsocialmedia' in request.path %}active{% endif %}">
                     <span>Followers</span>
                 </a>
+
 
                 {% else %}
 

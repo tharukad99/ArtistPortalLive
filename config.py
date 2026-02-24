@@ -8,7 +8,7 @@ class Config:
 
     # Database configuration with environment variable overrides
     # Default values are currently set to your development environments
-    DB_DRIVER = os.environ.get("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
+    DB_DRIVER = os.environ.get("DB_DRIVER", "{ODBC Driver 17 for SQL Server}")
     DB_SERVER = os.environ.get("DB_SERVER", "tharukatest.database.windows.net,1433")
     DB_DATABASE = os.environ.get("DB_DATABASE", "ARTISTSPORTALDB")
     DB_USER = os.environ.get("DB_USER", "tharuka")
