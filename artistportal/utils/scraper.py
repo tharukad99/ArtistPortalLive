@@ -25,7 +25,7 @@ class SocialScraper:
 
     def get_instagram_followers(self, username):
         """Fetch Instagram followers for a given username."""
-        print(f"Fetching Instagram followers for {username}")
+        print(f"Fetching Instagram followers for1 {username}")
         username = str(username).strip()
         url = f"https://www.instagram.com/{username}/"
         try:
