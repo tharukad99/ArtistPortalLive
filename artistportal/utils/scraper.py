@@ -19,17 +19,13 @@ class SocialScraper:
                 return int(float(text.replace('K', '')) * 1000)
             if 'M' in text:
                 return int(float(text.replace('M', '')) * 1000000)
-            if 'B' in text:
-                return int(float(text.replace('B', '')) * 1000000000)
-            
-            # Just extract numbers if no suffix
-            clean = re.sub(r"[^0-9.]", "", text)
-            return int(float(clean)) if clean else None
+            return int(re.sub(r"[^0-9]", "", text))
         except (ValueError, TypeError):
             return None
 
     def get_instagram_followers(self, username):
         """Fetch Instagram followers for a given username."""
+        print(f"Fetching Instagram followers for {username}")
         username = str(username).strip()
         url = f"https://www.instagram.com/{username}/"
         try:
@@ -38,7 +34,7 @@ class SocialScraper:
                 return None
             
             soup = BeautifulSoup(response.content, "html.parser")
-            # Usually found in og:description or description meta tag
+            # Usually found in og:description meta tag
             for tag in soup.find_all("meta"):
                 content = tag.get("content", "")
                 if "Followers" in content:

@@ -155,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <td>
           <div class="row-actions">
+            <button type="button" class="btn-small" data-action="view" data-id="${a.id}">View</button>
             <button type="button" class="btn-small" data-action="edit" data-id="${a.id}">Edit</button>
           </div>
         </td>
@@ -309,7 +310,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (action === "edit") {
       const artist = allArtists.find(a => a.id === id);
       if (artist) openModal("edit", artist);
+    } else if (action === "view") {
+      window.location.href = `/edit-home/${id}`;
     }
+
   });
 
   // ====== START ======

@@ -49,14 +49,8 @@ def scrape_social_metrics(artist_id):
 
 
         if not results:
-            log_info = {
-                "instagram_attempted": master.insta_username,
-                "facebook_attempted": master.fb_username
-            }
-            return jsonify({
-                "message": "Scraping completed but no new data was found. Please verify the handles are correct and public.",
-                "debug": log_info
-            }), 200
+            return jsonify({"message": "Scraping completed but no new data was found."}), 200
+
 
 
         db.session.commit()
