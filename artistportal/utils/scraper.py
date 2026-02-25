@@ -42,6 +42,7 @@ class SocialScraper:
                     m = re.search(r"([\d,.]+)([KMB]?)\s*Followers", content, re.IGNORECASE)
                     if m:
                         return self._as_int(m.group(1) + m.group(2))
+            print(f"for2 {self.headers}")
         except Exception as e:
             print(f"Error fetching Instagram ({username}): {e}")
         return None
