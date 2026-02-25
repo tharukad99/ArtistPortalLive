@@ -16,6 +16,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnExecuteScrape")?.addEventListener("click", () => handleExecuteScrape(artistId));
 
 
+  // Dropdown toggle
+  const dropdown = document.getElementById("actionsDropdown");
+  const dropdownToggle = document.getElementById("btnDropdownToggle");
+  if (dropdown && dropdownToggle) {
+    dropdownToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("active");
+      }
+    });
+  }
+
   wireMetricModal(artistId);
   wireLinkModal(artistId);
 });
@@ -712,7 +728,7 @@ async function handleExecuteScrape(artistId) {
   const btn = $("btnExecuteScrape");
   if (!btn || btn.disabled) return;
 
-  if (!confirm("This will attempt to fetch latest follower counts from Instagram and Facebook. Continue?")) return;
+  //if (!confirm("This will attempt to fetch latest follower counts from Instagram and Facebook. Continue?")) return;
 
   const originalText = btn.textContent;
   btn.textContent = "Executing...";
@@ -736,7 +752,7 @@ async function handleExecuteScrape(artistId) {
           msg += `\n- ${d.platform}: ${d.count.toLocaleString()} followers`;
         });
       }
-      alert(msg);
+      //alert(msg);
       // Refresh the page data
       await refreshDashboard(artistId);
       await loadMetricRows(artistId);

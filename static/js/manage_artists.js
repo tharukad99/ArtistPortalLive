@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="/edit-home/${a.id}" class="artist-link">
               ${escapeHtml(a.stageName || "")}
             </a>
-            <div class="muted">${escapeHtml(a.fullName || "")}</div>
+            <!-- <div class="muted">${escapeHtml(a.fullName || "")}</div> -->
           </div>
         </td>
 
