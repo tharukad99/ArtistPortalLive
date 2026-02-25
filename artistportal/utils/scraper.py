@@ -4,98 +4,84 @@ from bs4 import BeautifulSoup
 
 class SocialScraper:
     def __init__(self):
-        # User-Agent from the user's working script
+        # Simplified User-Agent works best for scraping public meta tags
         self.headers = {
             "User-Agent": "Mozilla/5.0"
         }
 
     def _as_int(self, s):
-        if not s: return None
-        # User's logic: strip non-numeric
+        """Convert string numbers like '1,004' or '1.2K' to integers."""
+        if not s:
+            return None
+        text = str(s).upper().replace(",", "").strip()
         try:
-            # First try careful conversion for K/M
-            text = str(s).upper().replace(",", "").strip()
-            multiplier = 1
             if 'K' in text:
-                multiplier = 1000
-                text = text.replace('K', '')
-            elif 'M' in text:
-                multiplier = 1000000
-                text = text.replace('M', '')
+                return int(float(text.replace('K', '')) * 1000)
+            if 'M' in text:
+                return int(float(text.replace('M', '')) * 1000000)
+            if 'B' in text:
+                return int(float(text.replace('B', '')) * 1000000000)
             
-            nums = re.findall(r"[\d.]+", text)
-            if nums:
-                return int(float(nums[0]) * multiplier)
-        except: pass
-        
-        # Fallback to user's provided regex
-        try:
-            clean = re.sub(r"[^0-9]", "", str(s))
-            return int(clean) if clean else None
-        except: return None
+            # Just extract numbers if no suffix
+            clean = re.sub(r"[^0-9.]", "", text)
+            return int(float(clean)) if clean else None
+        except (ValueError, TypeError):
+            return None
 
     def get_instagram_followers(self, username):
-        username = username or "tharukad92"
+        """Fetch Instagram followers for a given username."""
+        username = str(username).strip()
         url = f"https://www.instagram.com/{username}/"
         try:
-            r = requests.get(url, headers=self.headers, timeout=10)
-            if r.status_code != 200: return None
+            response = requests.get(url, headers=self.headers, timeout=10)
+            if response.status_code != 200:
+                return None
             
-            soup = BeautifulSoup(r.text, "html.parser")
-            
-            # 1. Meta Description
-            for meta in soup.find_all("meta"):
-                c = meta.get("content", "")
-                if "Followers" in c:
-                    m = re.search(r"([\d,.\w]+)\s*Followers", c, re.IGNORECASE)
-                    if m: return self._as_int(m.group(1))
-
-            # 2. Title
-            if soup.title and "Followers" in soup.title.string:
-                m = re.search(r"([\d,.\w]+)\s*Followers", soup.title.string, re.IGNORECASE)
-                if m: return self._as_int(m.group(1))
-
+            soup = BeautifulSoup(response.content, "html.parser")
+            # Usually found in og:description or description meta tag
+            for tag in soup.find_all("meta"):
+                content = tag.get("content", "")
+                if "Followers" in content:
+                    # Pattern match: "1,004 Followers"
+                    m = re.search(r"([\d,.]+)([KMB]?)\s*Followers", content, re.IGNORECASE)
+                    if m:
+                        return self._as_int(m.group(1) + m.group(2))
         except Exception as e:
-            print(f"IG Error: {e}")
+            print(f"Error fetching Instagram ({username}): {e}")
         return None
 
     def get_facebook_followers(self, identifier):
-        identifier = identifier or "61577393050995"
-        # User's URLs
-        urls = [
-            f"https://m.facebook.com/{identifier}",
-            f"https://www.facebook.com/{identifier}"
-        ]
-        
-        for url in urls:
-            try:
-                r = requests.get(url, headers=self.headers, timeout=10)
-                if r.status_code != 200: continue
-                
-                soup = BeautifulSoup(r.text, "html.parser")
-                
-                # 1. Meta Tags (from user logic)
-                for meta in soup.select("meta[content]"):
-                    content = meta.get("content", "")
-                    if re.search(r"followers|Followers|people follow|people like this|likes", content, re.IGNORECASE):
-                        m = re.search(r"([\d,.\w]+)\s*(?:followers|likes|people follow|people like this)", content, re.IGNORECASE)
-                        if m:
-                            val = self._as_int(m.group(1))
-                            if val and val > 0: return val
-
-                # 2. Visible Text (from user logic)
-                text = soup.get_text(separator=" ", strip=True)
-                patterns = [
-                    r"([0-9,\.]+)\s+people follow",
-                    r"([0-9,\.]+)\s+followers",
-                    r"([0-9,\.]+)\s+likes",
-                ]
-                for pat in patterns:
-                    m = re.search(pat, text, re.IGNORECASE)
+        """Fetch Facebook Page followers/likes for a given ID or username."""
+        identifier = str(identifier).strip()
+        url = f"https://www.facebook.com/{identifier}"
+        try:
+            response = requests.get(url, headers=self.headers, timeout=10)
+            if response.status_code != 200:
+                return None
+            
+            soup = BeautifulSoup(response.content, "html.parser")
+            
+            # 1. Check Meta Tags (Description often contains counts)
+            for tag in soup.find_all("meta"):
+                content = tag.get("content", "")
+                if re.search(r"followers|likes|people follow", content, re.IGNORECASE):
+                    # Try to find a number followed by keywords
+                    m = re.search(r"([\d,.]+)([KMB]?)\s*(?:followers|likes|people follow)", content, re.IGNORECASE)
                     if m:
-                        val = self._as_int(m.group(1))
-                        if val and val > 0: return val
-
-            except Exception as e:
-                print(f"FB Error: {e}")
+                        return self._as_int(m.group(1) + m.group(2))
+            
+            # 2. Heuristic: Search the entire page text
+            page_text = soup.get_text(separator=" ", strip=True)
+            patterns = [
+                r"([\d,.]+)([KMB]?)\s+people follow",
+                r"([\d,.]+)([KMB]?)\s+Followers",
+                r"([\d,.]+)([KMB]?)\s+likes",
+            ]
+            for pat in patterns:
+                m = re.search(pat, page_text, re.IGNORECASE)
+                if m:
+                    return self._as_int(m.group(1) + m.group(2))
+                    
+        except Exception as e:
+            print(f"Error fetching Facebook ({identifier}): {e}")
         return None
