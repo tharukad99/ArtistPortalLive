@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy import func, text
 from datetime import datetime
 from ..extensions import db
-from ..models import ArtistMetric, MetricType, MasterUserName
+from ..models import ArtistMetric, MetricType, MasterUserName, MasterspotifyUerId
 from ..utils.scraper import SocialScraper
 
 metrics_bp = Blueprint("metrics", __name__)
@@ -45,6 +45,17 @@ def scrape_social_metrics(artist_id):
                 )
                 results.append({"platform": "Facebook", "count": count})
 
+        # 4. Scrape Spotify
+        spotify_master = MasterspotifyUerId.query.filter_by(artistid=artist_id).first()
+        if spotify_master and spotify_master.spotify_user_id and spotify_master.access_token:
+            count = scraper.get_spotify_followers(spotify_master.access_token, spotify_master.spotify_user_id)
+            if count is not None:
+                # MetricTypeId=1 (Followers), PlatformId=3 (Spotify)
+                db.session.execute(
+                    text("EXEC dbo.usp_InsertArtistMetricRow @ArtistId=:aid, @MetricTypeId=1, @PlatformId=3, @MetricDate=:dt, @Value=:val"),
+                    {"aid": artist_id, "dt": datetime.utcnow().date(), "val": count}
+                )
+                results.append({"platform": "Spotify", "count": count})
 
 
 

@@ -8,5 +8,6 @@ from .models import (
     MetricType,
     Platform,
     ArtistMetric,
-    MasterUserName
+    MasterUserName,
+    MasterspotifyUerId
 )

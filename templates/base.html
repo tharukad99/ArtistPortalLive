@@ -47,12 +47,6 @@
                     <span>Social Media</span>
                 </a>
 
-                <a href="{{ url_for('followers_page', artist_id=artist_id) }}"
-                    class="nav-item {% if '/followers' in request.path %}active{% endif %}">
-                    <span>Followers</span>
-                </a>
-
-
                 <a href="{{ url_for('activities_page', artist_id=artist_id) }}"
                     class="nav-item {% if '/activities' in request.path %}active{% endif %}">
                     <span>Activities</span>

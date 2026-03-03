@@ -183,3 +183,14 @@ class MasterUserName(db.Model):
 
     artist = db.relationship("Artist", backref=db.backref("master_username", uselist=False))
 
+class MasterspotifyUerId(db.Model):
+    __tablename__ = "MasterspotifyUerId"
+
+    id = db.Column(db.Integer, primary_key=True)
+    artistid = db.Column(db.Integer, db.ForeignKey("Artists.ArtistId"), nullable=False, unique=True)
+    spotify_user_id = db.Column(db.String(255))
+    access_token = db.Column(db.Text)
+    createdate = db.Column(db.DateTime, default=datetime.utcnow)
+
+    artist = db.relationship("Artist", backref=db.backref("master_spotify_userid", uselist=False))
+

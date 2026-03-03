@@ -101,18 +101,33 @@ async function refreshDashboard(artistId) {
 }
 
 function loadSummaryCards(artistId) {
-  return fetch(`/api/metrics/summary/${artistId}`)
+  return fetch(`/api/metrics/rows/${artistId}`)
     .then(r => r.json())
-    .then(data => {
-      const followers = Number(data.followers || 0);
-      const views = Number(data.views || 0);
-      const streams = Number(data.streams || 0);
-      const totalReach = followers + views + streams;
+    .then(rows => {
+      const followerRows = rows.filter(r => r.metricTypeId === 1);
 
-      if ($("total-reach-count")) $("total-reach-count").textContent = totalReach.toLocaleString();
-      if ($("followers-count")) $("followers-count").textContent = followers.toLocaleString();
-      if ($("views-count")) $("views-count").textContent = views.toLocaleString();
-      if ($("streams-count")) $("streams-count").textContent = streams.toLocaleString();
+      const latestByPlatform = {};
+      followerRows.forEach(r => {
+        const pName = (r.platformName || "Unknown").toLowerCase();
+        if (!latestByPlatform[pName] || r.metricDate > latestByPlatform[pName].date) {
+          latestByPlatform[pName] = { date: r.metricDate, value: Number(r.value || 0) };
+        }
+      });
+
+      let fb = latestByPlatform["facebook"] ? latestByPlatform["facebook"].value : 0;
+      let ig = latestByPlatform["instagram"] ? latestByPlatform["instagram"].value : 0;
+      let yt = latestByPlatform["youtube"] ? latestByPlatform["youtube"].value : 0;
+      let sp = latestByPlatform["spotify"] ? latestByPlatform["spotify"].value : 0;
+      let bc = latestByPlatform["bandcamp"] ? latestByPlatform["bandcamp"].value : 0;
+
+      let totalFollowers = Object.values(latestByPlatform).reduce((sum, p) => sum + p.value, 0);
+
+      if ($("total-followers-count")) $("total-followers-count").textContent = totalFollowers.toLocaleString();
+      if ($("facebook-followers-count")) $("facebook-followers-count").textContent = fb.toLocaleString();
+      if ($("instagram-followers-count")) $("instagram-followers-count").textContent = ig.toLocaleString();
+      if ($("youtube-followers-count")) $("youtube-followers-count").textContent = yt.toLocaleString();
+      if ($("spotify-followers-count")) $("spotify-followers-count").textContent = sp.toLocaleString();
+      if ($("bandcamp-followers-count")) $("bandcamp-followers-count").textContent = bc.toLocaleString();
     })
     .catch(err => console.error("Error loading summary:", err));
 }
@@ -236,7 +251,7 @@ async function loadPlatforms() {
   if (sel) {
     sel.innerHTML =
       `<option value="">(none)</option>` +
-      PLATFORMS.map(p => `<option value="${p.PlatformId}">${escapeHtml(p.Name)} (${escapeHtml(p.Code)})</option>`).join("");
+      PLATFORMS.map(p => `<option value="${p.PlatformId}">${escapeHtml(p.Name)} </option>`).join("");
   }
 }
 

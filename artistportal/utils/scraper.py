@@ -82,3 +82,20 @@ class SocialScraper:
         except Exception as e:
             print(f"Error fetching Facebook ({identifier}): {e}")
         return None
+
+    def get_spotify_followers(self, token, artist_id):
+        """Fetch Spotify followers using API"""
+        print(f"Fetching Spotify followers for {artist_id}")
+        url = f"https://api.spotify.com/v1/artists/{artist_id}"
+        try:
+            response = requests.get(
+                url,
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=15,
+            )
+            response.raise_for_status()
+            artist = response.json()
+            return artist.get("followers", {}).get("total", 0)
+        except Exception as e:
+            print(f"Error fetching Spotify ({artist_id}): {e}")
+            return None

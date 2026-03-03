@@ -91,25 +91,44 @@ function loadArtistSidebar(artistId) {
 
 /* Load summary cards data */
 function loadSummaryCards(artistId) {
-    fetch(`/api/metrics/summary/${artistId}`)
+    fetch(`/api/metrics/rows/${artistId}`)
         .then(r => r.json())
-        .then(data => {
-            const followers = Number(data.followers || 0);
-            const views = Number(data.views || 0);
-            const streams = Number(data.streams || 0);
-            const totalReach = followers + views + streams;
+        .then(rows => {
+            const followerRows = rows.filter(r => r.metricTypeId === 1);
 
-            const trObj = document.getElementById("total-reach-count");
-            if (trObj) trObj.textContent = totalReach.toLocaleString();
+            const latestByPlatform = {};
+            followerRows.forEach(r => {
+                const pName = (r.platformName || "Unknown").toLowerCase();
+                if (!latestByPlatform[pName] || r.metricDate > latestByPlatform[pName].date) {
+                    latestByPlatform[pName] = { date: r.metricDate, value: Number(r.value || 0) };
+                }
+            });
 
-            const fObj = document.getElementById("followers-count");
-            if (fObj) fObj.textContent = followers.toLocaleString();
+            let fb = latestByPlatform["facebook"] ? latestByPlatform["facebook"].value : 0;
+            let ig = latestByPlatform["instagram"] ? latestByPlatform["instagram"].value : 0;
+            let yt = latestByPlatform["youtube"] ? latestByPlatform["youtube"].value : 0;
+            let sp = latestByPlatform["spotify"] ? latestByPlatform["spotify"].value : 0;
+            let bc = latestByPlatform["bandcamp"] ? latestByPlatform["bandcamp"].value : 0;
 
-            const vObj = document.getElementById("views-count");
-            if (vObj) vObj.textContent = views.toLocaleString();
+            let totalFollowers = Object.values(latestByPlatform).reduce((sum, p) => sum + p.value, 0);
 
-            const sObj = document.getElementById("streams-count");
-            if (sObj) sObj.textContent = streams.toLocaleString();
+            const tfObj = document.getElementById("total-followers-count");
+            if (tfObj) tfObj.textContent = totalFollowers.toLocaleString();
+
+            const fbObj = document.getElementById("facebook-followers-count");
+            if (fbObj) fbObj.textContent = fb.toLocaleString();
+
+            const igObj = document.getElementById("instagram-followers-count");
+            if (igObj) igObj.textContent = ig.toLocaleString();
+
+            const ytObj = document.getElementById("youtube-followers-count");
+            if (ytObj) ytObj.textContent = yt.toLocaleString();
+
+            const spObj = document.getElementById("spotify-followers-count");
+            if (spObj) spObj.textContent = sp.toLocaleString();
+
+            const bcObj = document.getElementById("bandcamp-followers-count");
+            if (bcObj) bcObj.textContent = bc.toLocaleString();
         })
         .catch(err => console.error("Error loading summary:", err));
 }
