@@ -46,9 +46,8 @@ def scrape_social_metrics(artist_id):
                 results.append({"platform": "Facebook", "count": count})
 
         # 4. Scrape Spotify
-        spotify_master = MasterspotifyUerId.query.filter_by(artistid=artist_id).first()
-        if spotify_master and spotify_master.spotify_user_id and spotify_master.access_token:
-            count = scraper.get_spotify_followers(spotify_master.access_token, spotify_master.spotify_user_id)
+        if master.spoti_username:
+            count = scraper.get_spotify_followers(master.spoti_username)
             if count is not None:
                 # MetricTypeId=1 (Followers), PlatformId=3 (Spotify)
                 db.session.execute(
@@ -57,6 +56,17 @@ def scrape_social_metrics(artist_id):
                 )
                 results.append({"platform": "Spotify", "count": count})
 
+        # 5. Scrape YouTube
+        if master.youtube_username:
+            youtube_api_key = "AIzaSyCSG8HmwtgHCngn0jMnb2AzmSlNv6E6Gv4"
+            count = scraper.get_youtube_subscribers(youtube_api_key, master.youtube_username)
+            if count is not None:
+                # MetricTypeId=1 (Followers), PlatformId=5 (YouTube)
+                db.session.execute(
+                    text("EXEC dbo.usp_InsertArtistMetricRow @ArtistId=:aid, @MetricTypeId=1, @PlatformId=5, @MetricDate=:dt, @Value=:val"),
+                    {"aid": artist_id, "dt": datetime.utcnow().date(), "val": count}
+                )
+                results.append({"platform": "YouTube", "count": count})
 
 
         if not results:

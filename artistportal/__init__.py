@@ -73,4 +73,8 @@ def create_app(config_object="config.Config"):
         except Exception as e:
             print(f"Error creating database tables (ignoring to allow app startup): {e}")
 
+    # Initialize the APScheduler for automated API triggering
+    from .scheduler import init_scheduler
+    init_scheduler(app)
+
     return app

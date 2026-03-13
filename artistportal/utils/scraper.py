@@ -1,5 +1,7 @@
 import requests
 import re
+import json
+import base64
 from bs4 import BeautifulSoup
 
 class SocialScraper:
@@ -83,19 +85,93 @@ class SocialScraper:
             print(f"Error fetching Facebook ({identifier}): {e}")
         return None
 
-    def get_spotify_followers(self, token, artist_id):
-        """Fetch Spotify followers using API"""
+    def get_spotify_followers(self, artist_id):
+        """Fetch Spotify followers by scraping public page"""
         print(f"Fetching Spotify followers for {artist_id}")
-        url = f"https://api.spotify.com/v1/artists/{artist_id}"
+        url = f"https://open.spotify.com/artist/{artist_id}"
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+
         try:
-            response = requests.get(
-                url,
-                headers={"Authorization": f"Bearer {token}"},
-                timeout=15,
-            )
+            response = requests.get(url, headers=headers, timeout=20)
             response.raise_for_status()
-            artist = response.json()
-            return artist.get("followers", {}).get("total", 0)
+
+            html = response.text
+
+            # Method 1: Try extracting from initialState base64 JSON block
+            initial_state_match = re.search(r'<script id="initialState" type="text/plain">([\s\S]*?)</script>', html)
+            if initial_state_match:
+                try:
+                    encoded_state = initial_state_match.group(1)
+                    decoded_state = base64.b64decode(encoded_state).decode('utf-8')
+                    data = json.loads(decoded_state)
+                    
+                    # The structure is usually entities -> items -> spotify:artist:{id} -> stats -> followers
+                    artist_key = f"spotify:artist:{artist_id}"
+                    stats = data.get("entities", {}).get("items", {}).get(artist_key, {}).get("stats", {})
+                    
+                    if "followers" in stats:
+                        return stats["followers"]
+                except Exception:
+                    pass
+
+            # Method 2: Fallback to searching the HTML tags directly
+            fallback_match = re.search(r'>([^<]+)<\/p><p[^>]*>Followers<\/p>', html)
+            if fallback_match:
+                followers_str = fallback_match.group(1).replace(",", "").strip()
+                if followers_str.isdigit():
+                    return int(followers_str)
+                    
+            # Method 3: Fallback to old follower total pattern inside page tags
+            match = re.search(r'"followers":\{"total":(\d+)', html)
+            if match:
+                return int(match.group(1))
+
         except Exception as e:
             print(f"Error fetching Spotify ({artist_id}): {e}")
+            
+        return None
+
+    def get_youtube_subscribers(self, api_key, username):
+        """Fetch YouTube subscribers using API"""
+        print(f"Fetching YouTube followers for {username}")
+        # Step 1: Get the channel ID from the username
+        username = username.replace("@", "").strip()
+        url_search = "https://www.googleapis.com/youtube/v3/search"
+        params_search = {
+            "part": "snippet",
+            "type": "channel",
+            "q": username,
+            "maxResults": 1,
+            "key": api_key
+        }
+        try:
+            response = requests.get(url_search, params=params_search, timeout=20)
+            response.raise_for_status()
+            data = response.json()
+            if not data.get("items"):
+                print(f"YouTube Channel not found for {username}")
+                return None
+            channel_id = data["items"][0]["id"]["channelId"]
+
+            # Step 2: Get the subscriber count using channel_id
+            url_stats = "https://www.googleapis.com/youtube/v3/channels"
+            params_stats = {
+                "part": "statistics",
+                "id": channel_id,
+                "key": api_key
+            }
+            response2 = requests.get(url_stats, params=params_stats, timeout=20)
+            response2.raise_for_status()
+            data2 = response2.json()
+            if not data2.get("items"):
+                return None
+            
+            stats = data2["items"][0]["statistics"]
+            sub_count = stats.get("subscriberCount", "0")
+            return int(sub_count)
+        except Exception as e:
+            print(f"Error fetching YouTube ({username}): {e}")
             return None

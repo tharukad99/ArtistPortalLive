@@ -136,24 +136,122 @@ function loadSummaryCards(artistId) {
 
 /* Load growth chart data */
 function loadGrowthChart(artistId) {
-    fetch(`/api/metrics/rows/${artistId}`)
-        .then(r => r.json())
-        .then(rows => {
-            // 1. Filter for Followers (MetricTypeId 1)
-            const followerRows = rows.filter(r => r.metricTypeId === 1);
+    Promise.all([
+        fetch(`/api/metrics/rows/${artistId}`).then(r => r.json()),
+        fetch(`/api/activities/artist/${artistId}`).then(r => r.json()).catch(() => [])
+    ])
+        .then(([rows, activities]) => {
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            const cutoffDate = oneYearAgo.toISOString().split('T')[0];
+
+            // 1. Filter for Followers (MetricTypeId 1) and from the last 1 year
+            const followerRows = rows.filter(r => r.metricTypeId === 1 && r.metricDate >= cutoffDate);
+            activities = activities.filter(a => a.date && a.date >= cutoffDate);
 
             // 2. Group by Date and Sum values
             const dailyTotals = {};
+            const platformTotals = {
+                'facebook': {},
+                'instagram': {},
+                'youtube': {},
+                'spotify': {}
+            };
+
             followerRows.forEach(r => {
                 const d = r.metricDate;
+                const pName = (r.platformName || "Unknown").toLowerCase();
+
                 if (!dailyTotals[d]) dailyTotals[d] = 0;
                 dailyTotals[d] += Number(r.value || 0);
+
+                if (platformTotals[pName]) {
+                    if (!platformTotals[pName][d]) platformTotals[pName][d] = 0;
+                    platformTotals[pName][d] += Number(r.value || 0);
+                }
             });
 
-            // 3. Sort dates and get values
-            const sortedDates = Object.keys(dailyTotals).sort();
-            const labels = sortedDates.map(d => formatMonth(d));
-            const values = sortedDates.map(d => dailyTotals[d]);
+            // 3. For each month, find the last available exact date for follower metrics.
+            const lastDatePerMonth = {};
+            Object.keys(dailyTotals).forEach(d => {
+                const month = d.substring(0, 7); // 'YYYY-MM'
+                if (!lastDatePerMonth[month] || d > lastDatePerMonth[month]) {
+                    lastDatePerMonth[month] = d;
+                }
+            });
+
+            // X-axis should have 1st of every month + exact dates of activities
+            const allDatesSet = new Set();
+            Object.keys(lastDatePerMonth).forEach(m => allDatesSet.add(`${m}-01`));
+            activities.forEach(a => {
+                if (a.date) allDatesSet.add(a.date);
+            });
+            const sortedDates = Array.from(allDatesSet).sort();
+
+            const formatPretty = (dateStr) => {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            };
+
+            const labels = sortedDates.map(d => formatPretty(d));
+
+            const values = [];
+            const fbValues = [];
+            const igValues = [];
+            const ytValues = [];
+            const spValues = [];
+            const eventValues = [];
+            const eventTitles = [];
+
+            let lastTotal = 0;
+            let firstKnownTotal = 0;
+            // Get initial lastTotal from the first month
+            if (sortedDates.length > 0) {
+                const firstMonth = sortedDates[0].substring(0, 7);
+                const actualDate = lastDatePerMonth[firstMonth];
+                if (actualDate && dailyTotals[actualDate] !== undefined) {
+                    firstKnownTotal = dailyTotals[actualDate];
+                }
+            }
+            if (lastTotal === 0) lastTotal = firstKnownTotal;
+
+            sortedDates.forEach(d => {
+                const isFirstOfMonth = d.endsWith("-01");
+                const month = d.substring(0, 7);
+
+                let currentTotal = null;
+                let fb = null, ig = null, yt = null, sp = null;
+
+                // Only plot follower data on the 1st of the month
+                if (isFirstOfMonth) {
+                    const actualDate = lastDatePerMonth[month];
+                    if (actualDate) {
+                        currentTotal = dailyTotals[actualDate] !== undefined ? dailyTotals[actualDate] : null;
+                        fb = platformTotals['facebook'][actualDate] !== undefined ? platformTotals['facebook'][actualDate] : null;
+                        ig = platformTotals['instagram'][actualDate] !== undefined ? platformTotals['instagram'][actualDate] : null;
+                        yt = platformTotals['youtube'][actualDate] !== undefined ? platformTotals['youtube'][actualDate] : null;
+                        sp = platformTotals['spotify'][actualDate] !== undefined ? platformTotals['spotify'][actualDate] : null;
+                    }
+                }
+
+                if (currentTotal !== null) lastTotal = currentTotal;
+
+                values.push(currentTotal);
+                fbValues.push(fb);
+                igValues.push(ig);
+                ytValues.push(yt);
+                spValues.push(sp);
+
+                const acts = activities.filter(a => a.date === d);
+                if (acts.length > 0) {
+                    eventTitles.push(acts.map(a => a.title).join(", "));
+                    // Use exact date metric if available, else use last known total
+                    eventValues.push(dailyTotals[d] !== undefined ? dailyTotals[d] : lastTotal);
+                } else {
+                    eventTitles.push(null);
+                    eventValues.push(null);
+                }
+            });
 
             const chartEl = document.getElementById("growth-chart");
             if (!chartEl) return;
@@ -165,34 +263,106 @@ function loadGrowthChart(artistId) {
                 type: "line",
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: "Total Followers",
-                        data: values,
-                        fill: true,
-                        borderColor: "#2458d3",
-                        backgroundColor: "rgba(36, 88, 211, 0.1)",
-                        borderWidth: 3,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: "#2458d3"
-                    }]
+                    datasets: [
+                        {
+                            label: "Activities",
+                            data: eventValues,
+                            showLine: false,
+                            pointStyle: 'circle',
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            borderColor: "#FFD700",
+                            backgroundColor: "#FFD700",
+                            borderWidth: 2
+                        },
+                        {
+                            label: "Total Followers",
+                            data: values,
+                            fill: false,
+                            borderColor: "#111827",
+                            backgroundColor: "#111827",
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            spanGaps: true
+                        },
+                        {
+                            label: "Facebook",
+                            data: fbValues,
+                            fill: false,
+                            borderColor: "#1877f2",
+                            backgroundColor: "#1877f2",
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 3,
+                            spanGaps: true
+                        },
+                        {
+                            label: "Instagram",
+                            data: igValues,
+                            fill: false,
+                            borderColor: "#ea0ee3",
+                            backgroundColor: "#ea0ee3",
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 3,
+                            spanGaps: true
+                        },
+                        {
+                            label: "YouTube",
+                            data: ytValues,
+                            fill: false,
+                            borderColor: "#ff0000",
+                            backgroundColor: "#ff0000",
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 3,
+                            spanGaps: true
+                        },
+                        {
+                            label: "Spotify",
+                            data: spValues,
+                            fill: false,
+                            borderColor: "#1db954",
+                            backgroundColor: "#1db954",
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 3,
+                            spanGaps: true
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
+                        legend: { display: true, position: 'bottom' },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return "Total: " + context.parsed.y.toLocaleString();
+                                    if (context.dataset.label === "Activities") {
+                                        const actTitle = eventTitles[context.dataIndex];
+                                        return "⭐ Event: " + actTitle + " (" + context.parsed.y.toLocaleString() + " Follows)";
+                                    }
+                                    return context.dataset.label + ": " + context.parsed.y.toLocaleString();
                                 }
                             }
                         }
                     },
                     scales: {
                         y: { beginAtZero: false, grid: { color: "rgba(0,0,0,0.05)" } },
-                        x: { grid: { display: false } }
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                callback: function (value, index) {
+                                    const dateStr = sortedDates[index];
+                                    if (dateStr && dateStr.endsWith("-01")) {
+                                        return labels[index];
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
                     }
                 }
             });

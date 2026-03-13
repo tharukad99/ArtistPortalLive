@@ -179,9 +179,12 @@ class MasterUserName(db.Model):
     artistid = db.Column(db.Integer, db.ForeignKey("Artists.ArtistId"), nullable=False, unique=True)
     fb_username = db.Column(db.String(255))
     insta_username = db.Column(db.String(255))
+    youtube_username = db.Column(db.String(255))
+    spoti_username = db.Column(db.String(255))
     createdate = db.Column(db.DateTime, default=datetime.utcnow)
 
     artist = db.relationship("Artist", backref=db.backref("master_username", uselist=False))
+
 
 class MasterspotifyUerId(db.Model):
     __tablename__ = "MasterspotifyUerId"

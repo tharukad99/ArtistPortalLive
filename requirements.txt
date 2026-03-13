@@ -6,3 +6,4 @@ Flask-Login
 Flask-Cors
 requests
 beautifulsoup4
+APScheduler
