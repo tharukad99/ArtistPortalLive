@@ -20,16 +20,28 @@ def list_artists():
         for r in rows
     ])
 
+from flask_login import current_user
+
 @artists_bp.get("/AllArtistsList")
 def list_all_artists():
-    # We join with PortalUsers to get the Email field
-    sql = text("""
-        SELECT a.*, u.Email 
-        FROM Artists a
-        LEFT JOIN PortalUsers u ON a.ArtistId = u.ArtistId
-        ORDER BY a.DateCreated DESC
-    """)
-    rows = db.session.execute(sql).mappings().all()
+    if current_user.is_authenticated and current_user.IsAdmin:
+        sql = text("""
+            SELECT a.*, u.Email 
+            FROM Artists a
+            LEFT JOIN PortalUsers u ON a.UserId = u.UserId
+            ORDER BY a.DateCreated DESC
+        """)
+        rows = db.session.execute(sql).mappings().all()
+    else:
+        user_id = current_user.UserId if current_user.is_authenticated else -1
+        sql = text("""
+            SELECT a.*, u.Email 
+            FROM Artists a
+            LEFT JOIN PortalUsers u ON a.UserId = u.UserId
+            WHERE a.UserId = :user_id
+            ORDER BY a.DateCreated DESC
+        """)
+        rows = db.session.execute(sql, {"user_id": user_id}).mappings().all()
 
     return jsonify([
         {
@@ -42,7 +54,8 @@ def list_all_artists():
             "primaryGenre": r["PrimaryGenre"],
             "websiteUrl": r["WebsiteUrl"],
             "isActive": r["IsActive"],
-            "email": r["Email"],
+            "userId": r.get("UserId", None),
+            "email": r.get("Email", None), # For backward compatibility
             "dateCreated": r["DateCreated"].isoformat() if r["DateCreated"] else None
         }
         for r in rows
@@ -373,35 +386,12 @@ def api_create_artist():
         artist_id = int(row["ArtistId"])
         email = (data.get("email") or "").strip() or None
 
-        # Auto-create user for the artist
-        existing_user_row = db.session.execute(text("SELECT UserId FROM PortalUsers WHERE ArtistId = :aid"), {"aid": artist_id}).first()
-        if not existing_user_row:
-            import re
-            
-            # Use first name from Full Name if available, otherwise stage name
-            full_name = (data.get("fullName") or "").strip()
-            name_for_user = full_name.split(' ')[0] if full_name else stage_name
-            
-            base_username = re.sub(r'[^a-zA-Z0-9]', '', name_for_user).lower()
-            # Default username is name without special characters + ID
-            if not base_username:
-                base_username = "artist"
-            username = f"{base_username}{artist_id}"
-            
-            from werkzeug.security import generate_password_hash
-            default_password = generate_password_hash("ArtistUser123!")
-            
+        # Link the newly created artist to the current manager/admin
+        user_id = current_user.UserId if getattr(current_user, "is_authenticated", False) else None
+        if user_id:
             db.session.execute(
-                text("""INSERT INTO PortalUsers (Username, PasswordHash, DisplayName, Role, IsAdmin, IsActive, DateCreated, ArtistId, Email)
-                        VALUES (:username, :pw_hash, :display_name, 2, 0, 1, GETUTCDATE(), :artist_id, :email)"""),
-                {"username": username, "pw_hash": default_password, "display_name": stage_name, "artist_id": artist_id, "email": email}
-            )
-            db.session.commit()
-        else:
-            # Update email if user already exists
-            db.session.execute(
-                text("UPDATE PortalUsers SET Email = :email WHERE ArtistId = :aid"),
-                {"email": email, "aid": artist_id}
+                text("UPDATE Artists SET UserId = :uid WHERE ArtistId = :aid"),
+                {"uid": user_id, "aid": artist_id}
             )
             db.session.commit()
 
@@ -510,6 +500,15 @@ def api_update_artist(artist_id: int):
             )
             db.session.commit()
 
+        # Update Assigned User if Admin
+        if getattr(current_user, "IsAdmin", False) and "userId" in data:
+            assigned_user_id = data.get("userId")
+            if assigned_user_id is None or assigned_user_id == 0 or assigned_user_id == "":
+                db.session.execute(text("UPDATE Artists SET UserId = NULL WHERE ArtistId = :aid"), {"aid": artist_id})
+            else:
+                db.session.execute(text("UPDATE Artists SET UserId = :uid WHERE ArtistId = :aid"), {"uid": int(assigned_user_id), "aid": artist_id})
+            db.session.commit()
+
         return jsonify({"success": True, "artistId": int(row["ArtistId"])})
 
     except Exception as ex:
@@ -526,7 +525,8 @@ def api_delete_artist_hard(artist_id: int):
         db.session.execute(text("DELETE FROM Activities WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM ArtistMetrics WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM PortalUsers WHERE ArtistId = :id"), {"id": artist_id})
-
+        db.session.execute(text("DELETE FROM MasterUserName WHERE artistid = :id"), {"id": artist_id})
+        db.session.execute(text("DELETE FROM MasterspotifyUerId WHERE artistid = :id"), {"id": artist_id})
 
         # TODO: add other child tables here if you have them (activities, socials, etc.)
 

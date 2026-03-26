@@ -164,11 +164,8 @@ font-weight: bold;
         <input type="email" id="email-input" placeholder="e.g. artist@example.com" required>
       </div>
 
-      <div class="actions">
-        <a href="{{ url_for('auth.login') }}" style="text-decoration:none;">
-          <button class="btn back" type="button">Password Login</button>
-        </a>
-        <button class="btn login" onclick="requestOTP()" id="req-btn">Send OTP</button>
+      <div class="actions" style="margin-top: 10px;">
+        <button class="btn login" onclick="requestOTP()" id="req-btn" style="width: 100%;">Send Security Code</button>
       </div>
     </div>
 

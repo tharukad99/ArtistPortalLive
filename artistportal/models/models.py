@@ -54,6 +54,7 @@ class Artist(db.Model):
     __tablename__ = "Artists"
 
     ArtistId = db.Column(db.Integer, primary_key=True)
+    UserId = db.Column(db.Integer, db.ForeignKey("PortalUsers.UserId"), nullable=True) # Enables Role-Based Artist Management
     StageName = db.Column(db.String(150), nullable=False)
     FullName = db.Column(db.String(200))
     Bio = db.Column(db.Text)

@@ -12,10 +12,8 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.get("/login")
 def login():
     if current_user.is_authenticated:
-        if current_user.IsAdmin:
-            return redirect(url_for("auth.manage_artists_page"))
-        return redirect(url_for("manage_home_page", artist_id=current_user.ArtistId))
-    return render_template("login.html")
+        return redirect(url_for("auth.manage_artists_page"))
+    return render_template("login_otp.html")
 
 
 @auth_bp.post("/login")
@@ -33,7 +31,8 @@ def login_post():
 
     if user.IsAdmin:
         return redirect(url_for("auth.manage_artists_page"))
-    return redirect(url_for("manage_home_page", artist_id=user.ArtistId))
+    # Send all users to manage artists page (dashboard) to pick which artist to manage
+    return redirect(url_for("auth.manage_artists_page"))
 
 
 @auth_bp.get("/logout")
@@ -48,8 +47,8 @@ def logout():
 @auth_bp.get("/admin/manage-artists")
 @login_required
 def manage_artists_page():
-    if not getattr(current_user, "IsAdmin", False):
-        return redirect(url_for("auth.login"))
+    # Both Admin and Normal users can view the dashboard now
+    # The AllArtistsList API handles role-based data filtering
     return render_template("manage_artists.html")
 
 
@@ -66,7 +65,7 @@ def manage_users_page():
 @auth_bp.get("/login-otp")
 def login_otp():
     if current_user.is_authenticated:
-        return redirect(url_for("auth.manage_artists_page" if current_user.IsAdmin else "manage_home_page", artist_id=current_user.ArtistId))
+        return redirect(url_for("auth.manage_artists_page"))
     return render_template("login_otp.html")
 
 
@@ -153,6 +152,6 @@ def verify_otp():
     login_user(user)
 
     # Return redirect URL
-    redirect_url = url_for("auth.manage_artists_page") if user.IsAdmin else url_for("manage_home_page", artist_id=user.ArtistId)
+    redirect_url = url_for("auth.manage_artists_page")
     
     return jsonify({"success": True, "redirect": redirect_url})

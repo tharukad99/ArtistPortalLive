@@ -22,10 +22,10 @@
         </a>
       </div>
 
-      <!-- 👤 Admin Login -->
+      <!-- 👤 Logged In User -->
       <div class="admin-block">
         <div class="admin-user">
-          👤 Admin
+          👤 {{ current_user.DisplayName if current_user.is_authenticated and current_user.DisplayName else (current_user.Username if current_user.is_authenticated else 'User') }}
         </div>
       </div>
 
@@ -34,9 +34,11 @@
         <a class="nav-link" href="/admin/manage-artists">
           Artists
         </a>
+        {% if current_user.is_authenticated and current_user.IsAdmin %}
         <a class="nav-link active" href="/admin/manage-users">
           Users
         </a>
+        {% endif %}
       </nav>
 
       <div class="sidebar-footer">
@@ -57,6 +59,7 @@
 
         <div class="page-actions">
           <input id="searchBox" class="search" type="text" placeholder="Search by username or name..." />
+          <button id="btnAddUser" type="button" class="btn-primary">+ Add User</button>
           <a href="{{ url_for('auth.logout', next=url_for('artist_list_page')) }}" class="btn-logout"
             id="btnLogout">Logout</a>
         </div>
@@ -77,6 +80,7 @@
                 <th>Email</th>
                 <th style="width:110px;">Active</th>
                 <th style="width:180px;">Created</th>
+                <th style="width:160px;">Actions</th>
               </tr>
             </thead>
             <tbody id="usersTbody"></tbody>
@@ -123,6 +127,51 @@
         <button type="button" class="btn-primary" id="btnSend">Save & Send Email</button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Modal for Create/Edit User -->
+  <div id="createUserModal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="createUserModalTitle">
+      <div class="modal-header">
+        <h2 id="createUserModalTitle" class="modal-title">Add New User</h2>
+        <button type="button" class="icon-btn" id="btnCloseUserModal" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId" value="0" />
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>Username *</span>
+            <input id="newUsername" type="text" placeholder="username" />
+          </label>
+          <label class="field span-2">
+            <span>Email</span>
+            <input id="newEmail" type="email" placeholder="user@example.com" />
+          </label>
+          <div class="field span-2" id="assignedArtistsField">
+            <span style="display:block; margin-bottom: 6px; font-weight: 600; font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">Assigned Artists</span>
+            <div id="assignedArtistsContainer" style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; width: 100%; height: 160px; overflow-y: auto; background: #F8FAFC; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+              <!-- Options populated via JS -->
+            </div>
+          </div>
+        </div>
+        <label class="checkbox" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px;">
+          <input id="newIsActive" type="checkbox" checked />
+          <span>Active</span>
+        </label>
+        <div id="createUserError" class="form-error"></div>
+      </div>
+      
+      <div class="modal-footer modal-footer-split">
+        <button type="button" class="btn-danger-outline" id="btnDeleteUser" hidden>
+          Delete User
+        </button>
+
+        <div class="modal-footer-right">
+          <button type="button" class="btn-secondary" id="btnCancelUser">Cancel</button>
+          <button type="button" class="btn-primary" id="btnSaveUser">Save User</button>
+        </div>
+      </div>
     </div>
   </div>
 

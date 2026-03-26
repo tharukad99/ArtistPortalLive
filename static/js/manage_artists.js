@@ -80,6 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
       bio.value = artist.bio || "";
       document.getElementById("email").value = artist.email || "";
       isActive.checked = !!artist.isActive;
+      if (document.getElementById("assignedUser")) {
+        document.getElementById("assignedUser").value = artist.userId || "0";
+      }
 
       // ✅ show delete in edit mode
       btnDeleteInModal.hidden = false;
@@ -205,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       profileImageUrl: (profileImageUrl.value || "").trim(),
       bio: (bio.value || "").trim(),
       email: (document.getElementById("email").value || "").trim(),
+      userId: parseInt(document.getElementById("assignedUser")?.value || "0", 10),
       isActive: isActive.checked
     };
 
@@ -331,6 +335,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   });
 
+  async function loadAssignableUsers() {
+    try {
+      const res = await fetch("/api/users/", { credentials: "include" });
+      if (!res.ok) return; // Silent fail (User isn't an admin, forbidden to see this)
+
+      const users = await res.json();
+      const selectObj = document.getElementById("assignedUser");
+      const fieldObj = document.getElementById("assignedUserField");
+
+      if (selectObj && fieldObj) {
+        // Clear all except default "-- None (Admin Only) --"
+        selectObj.innerHTML = '<option value="0">-- None (Unassigned) --</option>';
+
+        users.forEach(u => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `${u.username} (${u.displayName})`;
+          selectObj.appendChild(opt);
+        });
+
+        // Show the field!
+        fieldObj.style.display = "block";
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   // ====== START ======
   loadArtists();
+  loadAssignableUsers();
 });

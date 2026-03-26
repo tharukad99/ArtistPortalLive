@@ -22,10 +22,10 @@
         </a>
       </div>
 
-      <!-- 👤 Admin Login -->
+      <!-- 👤 Logged In User -->
       <div class="admin-block">
         <div class="admin-user">
-          👤 Admin
+          👤 {{ current_user.DisplayName if current_user.is_authenticated and current_user.DisplayName else (current_user.Username if current_user.is_authenticated else 'User') }}
         </div>
       </div>
 
@@ -34,9 +34,11 @@
         <a class="nav-link active" href="/admin/manage-artists">
           Artists
         </a>
+        {% if current_user.is_authenticated and current_user.IsAdmin %}
         <a class="nav-link" href="/admin/manage-users">
           Users
         </a>
+        {% endif %}
       </nav>
 
       <div class="sidebar-footer">
@@ -134,6 +136,13 @@
           <label class="field">
             <span>Email (for user account)</span>
             <input id="email" type="email" placeholder="artist@example.com" />
+          </label>
+
+          <label class="field" id="assignedUserField" style="display: none;">
+            <span>Assigned User</span>
+            <select id="assignedUser" style="padding:8px; border:1px solid #ccc; border-radius:4px; width:100%;">
+              <option value="0">-- None (Admin Only) --</option>
+            </select>
           </label>
 
           <label class="field span-2">
