@@ -139,6 +139,9 @@ function initProfileEdit(artistId) {
     const sidebarImg = document.getElementById("sidebar-artist-image");
     if (sidebarImg) sidebarImg.src = payload.profileImageUrl || "https://via.placeholder.com/80x80?text=Artist";
 
+    const sidebarName = document.getElementById("sidebar-artist-name");
+    if (sidebarName) sidebarName.textContent = payload.stageName || "Artist";
+
     // ensure profile card is visible after save
     showCard("card-profile");
 
