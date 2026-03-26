@@ -28,12 +28,47 @@ class SocialScraper:
 
     def get_instagram_followers(self, username):
         """Fetch Instagram followers for a given username."""
-        print(f"Fetching Instagram followers for1 {username}")
+        print(f"Fetching Instagram followers for {username}")
         username = str(username).strip()
+        
+        # NOTE: Scraping Instagram directly from an Azure/Datacenter IP is highly likely to be 
+        # blocked (returning 302 Redirect or 429 Too Many Requests). 
+        # For a robust solution in production, uncomment and use a third-party API like RapidAPI below.
+        
+        """
+        # --- RAPIDAPI / THIRD-PARTY API APPROACH (RECOMMENDED FOR AZURE) ---
+        url = "https://instagram-scraper-api2.p.rapidapi.com/v1/info"
+        querystring = {"username_or_id_or_url": username}
+        headers = {
+            "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY", # Get this from rapidapi.com
+            "X-RapidAPI-Host": "instagram-scraper-api2.p.rapidapi.com"
+        }
+        try:
+            response = requests.get(url, headers=headers, params=querystring, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('data', {}).get('follower_count')
+        except Exception as e:
+            print(f"RapidAPI fallback error: {e}")
+        """
+
+        # --- DIRECT SCRAPING APPROACH (OFTEN FAILS ON AZURE DU TO IP BAN) ---
         url = f"https://www.instagram.com/{username}/"
         try:
-            response = requests.get(url, headers=self.headers, timeout=10)
+            # Upgraded headers to look more like a real browser
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Upgrade-Insecure-Requests": "1"
+            }
+            response = requests.get(url, headers=headers, timeout=10)
+            
             if response.status_code != 200:
+                print(f"Instagram blocked the request (Azure IP block). Status Code: {response.status_code}")
                 return None
             
             soup = BeautifulSoup(response.content, "html.parser")
@@ -45,7 +80,8 @@ class SocialScraper:
                     m = re.search(r"([\d,.]+)([KMB]?)\s*Followers", content, re.IGNORECASE)
                     if m:
                         return self._as_int(m.group(1) + m.group(2))
-            print(f"for2 {self.headers}")
+            
+            print(f"Follower meta tag not found. Instagram may have served a login page. Title: {soup.title.string if soup.title else 'No Title'}")
         except Exception as e:
             print(f"Error fetching Instagram ({username}): {e}")
         return None
