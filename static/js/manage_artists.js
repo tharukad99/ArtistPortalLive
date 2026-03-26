@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       websiteUrl.value = "";
       profileImageUrl.value = "";
       bio.value = "";
+      document.getElementById("email").value = "";
       isActive.checked = true;
 
       // ✅ hide delete in add mode
@@ -77,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       websiteUrl.value = artist.websiteUrl || "";
       profileImageUrl.value = artist.profileImageUrl || "";
       bio.value = artist.bio || "";
+      document.getElementById("email").value = artist.email || "";
       isActive.checked = !!artist.isActive;
 
       // ✅ show delete in edit mode
@@ -202,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       websiteUrl: (websiteUrl.value || "").trim(),
       profileImageUrl: (profileImageUrl.value || "").trim(),
       bio: (bio.value || "").trim(),
+      email: (document.getElementById("email").value || "").trim(),
       isActive: isActive.checked
     };
 
@@ -234,6 +237,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       closeModal();
       await loadArtists();
+
+      // Show message if it was a new artist with a website URL
+      if (id === 0 && payload.websiteUrl) {
+        statusEl.style.color = "#15803d"; // Success green
+        statusEl.style.fontWeight = "700";
+        setStatus("Social media links saved... (captured from website)");
+        setTimeout(() => {
+          setStatus("");
+          statusEl.style.color = "";
+          statusEl.style.fontWeight = "";
+        }, 6000);
+      }
     } finally {
       btnSave.disabled = false;
       btnSave.textContent = oldText;

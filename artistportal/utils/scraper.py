@@ -3,6 +3,7 @@ import re
 import json
 import base64
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 
 class SocialScraper:
     def __init__(self):
@@ -175,3 +176,73 @@ class SocialScraper:
         except Exception as e:
             print(f"Error fetching YouTube ({username}): {e}")
             return None
+
+class LinkExtractor:
+    SOCIAL_DOMAINS = {
+        "facebook": ["facebook.com", "fb.com"],
+        "instagram": ["instagram.com"],
+        "twitter_x": ["twitter.com", "x.com"],
+        "linkedin": ["linkedin.com"],
+        "youtube": ["youtube.com", "youtu.be"],
+        "tiktok": ["tiktok.com"],
+        "threads": ["threads.net"],
+        "bandcamp": ["bandcamp.com"],
+        "apple_music": ["music.apple.com"],
+        "spotify": ["spotify.com", "open.spotify.com"],
+        "soundcloud": ["soundcloud.com"],
+    }
+
+    def __init__(self):
+        self.headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/122.0 Safari/537.36"
+            )
+        }
+
+    def normalize_url(self, url: str) -> str:
+        url = url.strip()
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+        return url
+
+    def is_valid_url(self, url: str) -> bool:
+        try:
+            parsed = urlparse(url)
+            return parsed.scheme in ["http", "https"] and parsed.netloc != ""
+        except Exception:
+            return False
+
+    def extract_social_links(self, website_url: str):
+        website_url = self.normalize_url(website_url)
+        if not self.is_valid_url(website_url):
+            return {}
+
+        try:
+            response = requests.get(website_url, headers=self.headers, timeout=15)
+            response.raise_for_status()
+        except Exception as e:
+            print(f"Error fetching {website_url}: {e}")
+            return {}
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        all_links = set()
+
+        for tag in soup.find_all("a", href=True):
+            href = tag["href"].strip()
+            full_link = urljoin(website_url, href)
+            all_links.add(full_link)
+
+        results = {platform: [] for platform in self.SOCIAL_DOMAINS}
+
+        for link in all_links:
+            link_lower = link.lower()
+            for platform, domains in self.SOCIAL_DOMAINS.items():
+                if any(domain in link_lower for domain in domains):
+                    # Basic cleaning: remove trailing slash and query params for comparison
+                    clean_link = link.split('?')[0].rstrip('/')
+                    if clean_link not in results[platform]:
+                        results[platform].append(link)
+
+        return results

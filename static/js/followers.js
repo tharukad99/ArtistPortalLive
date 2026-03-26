@@ -102,7 +102,20 @@ function renderGrowthChart(rows) {
             plugins: { legend: { display: false } },
             scales: {
                 y: { grid: { color: 'rgba(0,0,0,0.05)' } },
-                x: { grid: { display: false } }
+                x: { 
+                    grid: { display: false },
+                    ticks: {
+                        callback: function(value, index) {
+                            const dateStr = this.getLabelForValue(value);
+                            if (dateStr && (dateStr.endsWith("-01") || dates.length < 10)) {
+                                const d = new Date(dateStr);
+                                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                return months[d.getUTCMonth()];
+                            }
+                            return null;
+                        }
+                    }
+                }
             }
         }
     });

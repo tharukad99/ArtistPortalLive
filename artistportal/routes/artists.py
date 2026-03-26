@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from ..models import Artist
 from ..extensions import db
 from sqlalchemy import text
@@ -22,7 +22,13 @@ def list_artists():
 
 @artists_bp.get("/AllArtistsList")
 def list_all_artists():
-    sql = text("EXEC dbo.ListAllArtists")
+    # We join with PortalUsers to get the Email field
+    sql = text("""
+        SELECT a.*, u.Email 
+        FROM Artists a
+        LEFT JOIN PortalUsers u ON a.ArtistId = u.ArtistId
+        ORDER BY a.DateCreated DESC
+    """)
     rows = db.session.execute(sql).mappings().all()
 
     return jsonify([
@@ -36,6 +42,7 @@ def list_all_artists():
             "primaryGenre": r["PrimaryGenre"],
             "websiteUrl": r["WebsiteUrl"],
             "isActive": r["IsActive"],
+            "email": r["Email"],
             "dateCreated": r["DateCreated"].isoformat() if r["DateCreated"] else None
         }
         for r in rows
@@ -62,9 +69,6 @@ def get_artist(artist_id):
         "sourcesCount": int(row["SourcesCount"] or 0)
     })
 
-# ------------------------------------------------------------
-# CONSOLIDATED DASHBOARD ENDPOINT (FAST LOAD)
-# ------------------------------------------------------------
 @artists_bp.get("/<int:artist_id>/full_dashboard")
 def get_dashboard_data(artist_id):
     try:
@@ -183,11 +187,6 @@ def get_dashboard_data(artist_id):
         current_app.logger.exception("Dashboard load error")
         return jsonify({"error": str(ex)}), 500
 
-
-
-#####Artist Photos API Section ########
-
-
 # Get photos of a specific artist
 @artists_bp.get("/<int:artist_id>/photos")
 def get_artist_photos(artist_id):
@@ -218,9 +217,7 @@ def get_artist_photos(artist_id):
 from flask import request, jsonify
 from sqlalchemy import text
 
-# ---------------------------------------------------------
 # INSERT: Add a photo for an artist
-# ---------------------------------------------------------
 @artists_bp.post("/<int:artist_id>/photos")
 def insert_artist_photo(artist_id):
     data = request.get_json(silent=True) or {}
@@ -265,12 +262,7 @@ def insert_artist_photo(artist_id):
         "sortOrder": sort_order
     }), 201
 
-# ---------------------------------------------------------
 # UPDATE: Update an existing photo row
-# PUT /artists/<artist_id>/photos/<photo_id>
-# Body JSON: { "url": "...", "caption": "...", "sortOrder": 2 }
-# (send only fields you want to change)
-# ---------------------------------------------------------
 from flask import request, jsonify
 from sqlalchemy import text
 
@@ -311,11 +303,7 @@ def update_artist_photo(artist_id, photo_id):
     db.session.commit()
     return jsonify({"message": "Photo updated", "photoId": photo_id}), 200
 
-
-# ---------------------------------------------------------
 # DELETE: Remove a photo
-# DELETE /artists/<artist_id>/photos/<photo_id>
-# ---------------------------------------------------------
 @artists_bp.delete("/<int:artist_id>/photos/<int:photo_id>")
 def delete_artist_photo(artist_id, photo_id):
     sql = """
@@ -336,10 +324,6 @@ def delete_artist_photo(artist_id, photo_id):
 
     db.session.commit()
     return jsonify({"message": "Photo deleted", "photoId": photo_id}), 200
-
-
-
-########################################################################################################
 
 # ADMIN: create artist
 @artists_bp.post("/create")
@@ -386,12 +370,91 @@ def api_create_artist():
         if not row:
             return jsonify({"success": False, "message": "Database did not return a new ArtistId."}), 500
 
-        return jsonify({"success": True, "artistId": int(row["ArtistId"])}), 201
+        artist_id = int(row["ArtistId"])
+        email = (data.get("email") or "").strip() or None
+
+        # Auto-create user for the artist
+        existing_user_row = db.session.execute(text("SELECT UserId FROM PortalUsers WHERE ArtistId = :aid"), {"aid": artist_id}).first()
+        if not existing_user_row:
+            import re
+            
+            # Use first name from Full Name if available, otherwise stage name
+            full_name = (data.get("fullName") or "").strip()
+            name_for_user = full_name.split(' ')[0] if full_name else stage_name
+            
+            base_username = re.sub(r'[^a-zA-Z0-9]', '', name_for_user).lower()
+            # Default username is name without special characters + ID
+            if not base_username:
+                base_username = "artist"
+            username = f"{base_username}{artist_id}"
+            
+            from werkzeug.security import generate_password_hash
+            default_password = generate_password_hash("ArtistUser123!")
+            
+            db.session.execute(
+                text("""INSERT INTO PortalUsers (Username, PasswordHash, DisplayName, Role, IsAdmin, IsActive, DateCreated, ArtistId, Email)
+                        VALUES (:username, :pw_hash, :display_name, 2, 0, 1, GETUTCDATE(), :artist_id, :email)"""),
+                {"username": username, "pw_hash": default_password, "display_name": stage_name, "artist_id": artist_id, "email": email}
+            )
+            db.session.commit()
+        else:
+            # Update email if user already exists
+            db.session.execute(
+                text("UPDATE PortalUsers SET Email = :email WHERE ArtistId = :aid"),
+                {"email": email, "aid": artist_id}
+            )
+            db.session.commit()
+
+        # Start background task to extract social links if a website is provided
+        if params["WebsiteUrl"]:
+            import threading
+            # We pass current_app._get_current_object() to the thread because current_app is a proxy
+            app_instance = current_app._get_current_object()
+            threading.Thread(
+                target=background_extract_social_links, 
+                args=(app_instance, artist_id, params["WebsiteUrl"])
+            ).start()
+
+        return jsonify({"success": True, "artistId": artist_id}), 201
 
     except Exception as ex:
         db.session.rollback()
         return jsonify({"success": False, "message": str(ex)}), 500
 
+def background_extract_social_links(app, artist_id, website_url):
+    with app.app_context():
+        try:
+            from ..utils.scraper import LinkExtractor
+            extractor = LinkExtractor()
+            links_found = extractor.extract_social_links(website_url)
+            
+            if not links_found:
+                return
+
+            st_rows = db.session.execute(text("SELECT SourceTypeId, Code FROM SourceTypes")).mappings().all()
+            code_to_id = {r["Code"].lower(): r["SourceTypeId"] for r in st_rows}
+            
+            for platform, urls in links_found.items():
+                if urls and platform in code_to_id:
+                    st_id = code_to_id[platform]
+                    for url in urls:
+                        # Check if link already exists for this artist
+                        exists = db.session.execute(
+                            text("SELECT 1 FROM ArtistSources WHERE ArtistId = :aid AND Url = :url"),
+                            {"aid": artist_id, "url": url}
+                        ).first()
+                        
+                        if not exists:
+                            display_name = platform.replace('_', ' ').title()
+                            db.session.execute(
+                                text("""INSERT INTO ArtistSources (ArtistId, SourceTypeId, Url, DateAdded, IsPrimary, DisplayName)
+                                        VALUES (:aid, :stid, :url, GETUTCDATE(), 0, :dn)"""),
+                                {"aid": artist_id, "stid": st_id, "url": url, "dn": display_name}
+                            )
+            db.session.commit()
+            print(f"Successfully extracted social links for Artist {artist_id} from {website_url}")
+        except Exception as e:
+            print(f"Background social link extraction failed for Artist {artist_id}: {e}")
 
 # ADMIN: update artist
 @artists_bp.put("/<int:artist_id>")
@@ -438,15 +501,22 @@ def api_update_artist(artist_id: int):
         if not row:
              return jsonify({"success": False, "message": "Database update failed (no ID returned)."}), 500
 
+        # Update email in PortalUsers if provided
+        email = (data.get("email") or "").strip() or None
+        if email:
+            db.session.execute(
+                text("UPDATE PortalUsers SET Email = :email WHERE ArtistId = :aid"),
+                {"email": email, "aid": artist_id}
+            )
+            db.session.commit()
+
         return jsonify({"success": True, "artistId": int(row["ArtistId"])})
 
     except Exception as ex:
         db.session.rollback()
         return jsonify({"success": False, "message": str(ex)}), 500
-# ---------------------------------------------------------
+
 # ADMIN: HARD delete artist
-# DELETE /api/artists/<artist_id>
-# ---------------------------------------------------------
 @artists_bp.delete("delete/<int:artist_id>")
 def api_delete_artist_hard(artist_id: int):
     try:
@@ -455,6 +525,7 @@ def api_delete_artist_hard(artist_id: int):
         db.session.execute(text("DELETE FROM ArtistSources WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM Activities WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM ArtistMetrics WHERE ArtistId = :id"), {"id": artist_id})
+        db.session.execute(text("DELETE FROM PortalUsers WHERE ArtistId = :id"), {"id": artist_id})
 
 
         # TODO: add other child tables here if you have them (activities, socials, etc.)

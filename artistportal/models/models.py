@@ -16,10 +16,11 @@ class User(db.Model, UserMixin):
     PasswordHash = db.Column(db.String(255), nullable=False)
     DisplayName = db.Column(db.String(150), nullable=False)
     IsAdmin = db.Column(db.Boolean, default=False)
-    Role = db.Column(db.String(20), nullable=False, default="admin")
+    Role = db.Column(db.Integer, nullable=False, default=0)
     IsActive = db.Column(db.Boolean, default=True)
     DateCreated = db.Column(db.DateTime, default=datetime.utcnow)
     ArtistId = db.Column(db.Integer, nullable=True)
+    Email = db.Column(db.String(150), nullable=True)
 
     """
     Returns the unique identifier for the user (required by Flask-Login).
@@ -196,4 +197,15 @@ class MasterspotifyUerId(db.Model):
     createdate = db.Column(db.DateTime, default=datetime.utcnow)
 
     artist = db.relationship("Artist", backref=db.backref("master_spotify_userid", uselist=False))
+
+
+class OneTimePassword(db.Model):
+    __tablename__ = "OneTimePasswords"
+
+    Id = db.Column(db.Integer, primary_key=True)
+    UserId = db.Column(db.Integer, db.ForeignKey("PortalUsers.UserId"), nullable=False)
+    OTPCode = db.Column(db.String(10), nullable=False)
+    ExpiryTime = db.Column(db.DateTime, nullable=False)
+    IsUsed = db.Column(db.Boolean, default=False)
+    DateCreated = db.Column(db.DateTime, default=datetime.utcnow)
 

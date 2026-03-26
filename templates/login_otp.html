@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login with Email OTP</title>
+
+<style>
+:root{
+--muted:#9ca3af;
+--shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+font-family:system-ui;
+background:#ffffff;
+color:#111827;
+}
+
+.page{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.card{
+width:min(420px,92vw);
+padding:32px;
+border-radius:22px;
+background:#ffffff;
+box-shadow:var(--shadow);
+border:1px solid #e5e7eb;
+}
+
+h2{
+margin:0 0 18px;
+font-size:24px;
+text-align: center;
+}
+
+.field{
+margin-bottom:18px;
+}
+
+label{
+display:block;
+font-size:13px;
+color:#6b7280;
+margin-bottom:8px;
+}
+
+input{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:1px solid #d1d5db;
+background:#f9fafb;
+outline:none;
+font-size: 16px;
+transition: all 0.2s ease;
+}
+
+input:focus{
+border-color:#7c3aed;
+background:#fff;
+box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-top:24px;
+}
+
+.btn{
+height:48px;
+padding:0 24px;
+border-radius:14px;
+border:none;
+cursor:pointer;
+font-weight:600;
+font-size:15px;
+transition: all 0.2s ease;
+}
+
+.login{
+flex: 1;
+background:#111827;
+color:white;
+}
+
+.login:hover{
+opacity:.9;
+transform: translateY(-1px);
+}
+
+.back{
+background:#f3f4f6;
+color:#111827;
+}
+
+.back:hover{
+background:#e5e7eb;
+}
+
+.message {
+padding: 12px;
+border-radius: 12px;
+font-size: 14px;
+margin-bottom: 20px;
+}
+
+.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+.hidden { display: none; }
+.loading { opacity: 0.6; pointer-events: none; cursor: wait; }
+
+.footer{
+padding:20px 0;
+font-size:12px;
+color:#6b7280;
+text-align:center;
+}
+
+.footer a{
+color:#111827;
+text-decoration:none;
+}
+
+#otp-input {
+text-align: center;
+font-size: 28px;
+letter-spacing: 8px;
+font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="card" id="main-card">
+    <h2>Login with OTP</h2>
+    
+    <div id="msg" class="message hidden"></div>
+
+    <!-- Step 1: Request OTP -->
+    <div id="request-section">
+      <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px; text-align: center;">Enter your registered email address to receive a security code.</p>
+      
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="email-input" placeholder="e.g. artist@example.com" required>
+      </div>
+
+      <div class="actions">
+        <a href="{{ url_for('auth.login') }}" style="text-decoration:none;">
+          <button class="btn back" type="button">Password Login</button>
+        </a>
+        <button class="btn login" onclick="requestOTP()" id="req-btn">Send OTP</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Verify OTP -->
+    <div id="verify-section" class="hidden">
+      <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px; text-align: center;">We've sent a 6-digit code to <br><b id="target-email" style="color:#111827;"></b></p>
+      
+      <div class="field">
+        <label>Enter 6-digit Code</label>
+        <input type="text" id="otp-input" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+      </div>
+
+      <div class="actions">
+        <button class="btn back" onclick="backToRequest()">Change Email</button>
+        <button class="btn login" onclick="verifyOTP()" id="ver-btn">Verify & Login</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+© 2025 <a href="https://www.lepus-arts.com/" target="_blank">Lepus Art</a>
+</div>
+
+<script>
+const msg = document.getElementById('msg');
+const reqSection = document.getElementById('request-section');
+const verSection = document.getElementById('verify-section');
+const mainCard = document.getElementById('main-card');
+
+function showMsg(text, type) {
+    msg.textContent = text;
+    msg.className = `message ${type}`;
+    msg.classList.remove('hidden');
+}
+
+function hideMsg() {
+    msg.classList.add('hidden');
+}
+
+async function requestOTP() {
+    const email = document.getElementById('email-input').value.trim();
+    if (!email) return;
+
+    mainCard.classList.add('loading');
+    hideMsg();
+
+    try {
+        const res = await fetch('/api/auth/otp/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById('target-email').textContent = email;
+            reqSection.classList.add('hidden');
+            verSection.classList.remove('hidden');
+            showMsg("Code sent! Check your inbox.", "success");
+        } else {
+            showMsg(data.message || "Failed to send OTP.", "error");
+        }
+    } catch (e) {
+        showMsg("Network error. Please try again.", "error");
+    } finally {
+        mainCard.classList.remove('loading');
+    }
+}
+
+async function verifyOTP() {
+    const email = document.getElementById('email-input').value.trim();
+    const otp = document.getElementById('otp-input').value.trim();
+    if (!otp || otp.length < 6) {
+        showMsg("Please enter the 6-digit code.", "error");
+        return;
+    }
+
+    mainCard.classList.add('loading');
+    hideMsg();
+
+    try {
+        const res = await fetch('/api/auth/otp/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showMsg("Login successful! Redirecting...", "success");
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 800);
+        } else {
+            showMsg(data.message || "Invalid or expired code.", "error");
+        }
+    } catch (e) {
+        showMsg("Network error. Please try again.", "error");
+    } finally {
+        mainCard.classList.remove('loading');
+    }
+}
+
+function backToRequest() {
+    verSection.classList.add('hidden');
+    reqSection.classList.remove('hidden');
+    hideMsg();
+}
+
+// Auto-submit OTP when 6 digits are entered
+document.getElementById('otp-input').addEventListener('input', (e) => {
+    if (e.target.value.length === 6) {
+        verifyOTP();
+    }
+});
+</script>
+
+</body>
+</html>

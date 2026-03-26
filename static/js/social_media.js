@@ -21,7 +21,8 @@ const iconMap = {
     emubands: "fa-solid fa-music",
     bbc_sounds: "fa-solid fa-radio",
     acast: "fa-solid fa-podcast",
-    twitter_x: "fa-brands fa-x-twitter"
+    twitter_x: "fa-brands fa-x-twitter",
+    soundcloud: "fa-brands fa-soundcloud"
 };
 
 /* Load and render social links for the artist */
@@ -190,7 +191,8 @@ function loadGrowthChart(artistId) {
 
             const formatPretty = (dateStr) => {
                 const d = new Date(dateStr);
-                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                return months[d.getUTCMonth()];
             };
 
             const labels = sortedDates.map(d => formatPretty(d));
@@ -437,9 +439,6 @@ function formatMonth(dateStr) {
 
 function formatPrettyDate(dateStr) {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    });
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months[d.getUTCMonth()];
 }

@@ -1,4 +1,3 @@
-# config.py
 import urllib.parse
 import os
 
@@ -30,7 +29,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-#===========================================================================
+#=====================Local SQL Server======================================================
 
 # config.py
 # import urllib.parse
@@ -55,3 +54,20 @@ class Config:
 
 #     SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
 #     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+
+
+#email sending settings
+
+    # EmailJS settings test email
+    # EMAILJS_SERVICE_ID = "service_w2fccgp"
+    # EMAILJS_TEMPLATE_ID = "template_ue0peal"
+    # EMAILJS_PUBLIC_KEY = "vwcoJIUUH5bkSfzRS"
+    # EMAILJS_PRIVATE_KEY = "G-KwZG22fVHhFx6-0EF2E"
+
+    # EmailJS settings Artisights email
+    EMAILJS_SERVICE_ID = "service_w6qp9kr"
+    EMAILJS_TEMPLATE_ID = "template_1m1eve5"
+    EMAILJS_PUBLIC_KEY = "vwcoJIUUH5bkSfzRS"
+    EMAILJS_PRIVATE_KEY = "G-KwZG22fVHhFx6-0EF2E"

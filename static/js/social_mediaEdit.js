@@ -187,7 +187,8 @@ function loadGrowthChart(artistId) {
 
       const formatPretty = (dateStr) => {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return months[d.getMonth()];
       };
 
       const labels = sortedDates.map(d => formatPretty(d));
@@ -697,7 +698,8 @@ const socialIconMap = {
   emubands: { icon: "fa-solid fa-music", bg: "" },
   bbc_sounds: { icon: "fa-solid fa-radio", bg: "" },
   acast: { icon: "fa-solid fa-podcast", bg: "" },
-  twitter_x: { icon: "fa-brands fa-x-twitter", bg: "" }
+  twitter_x: { icon: "fa-brands fa-x-twitter", bg: "" },
+  soundcloud: { icon: "fa-brands fa-soundcloud", bg: "icon-bg-sc" }
 };
 
 function platformClassFromCode(code) {

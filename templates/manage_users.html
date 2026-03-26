@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Users - ArtiSights</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/manage_artists.css') }}">
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sidebar-header">
+        <a class="brand" href="/admin/manage-artists">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ArtiSights Logo" class="sidebar-logo">
+        </a>
+      </div>
+
+      <!-- 👤 Admin Login -->
+      <div class="admin-block">
+        <div class="admin-user">
+          👤 Admin
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="/admin/manage-artists">
+          Artists
+        </a>
+        <a class="nav-link active" href="/admin/manage-users">
+          Users
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-note">© 2025 Lepus Art</div>
+      </div>
+
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;">
+          <button id="sidebarToggle" class="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h1 class="page-title">Users</h1>
+        </div>
+
+        <div class="page-actions">
+          <input id="searchBox" class="search" type="text" placeholder="Search by username or name..." />
+          <a href="{{ url_for('auth.logout', next=url_for('artist_list_page')) }}" class="btn-logout"
+            id="btnLogout">Logout</a>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="card-top">
+          <!-- <h3 class="card-title">Portal Users</h3> -->
+          <div id="status" class="status"></div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Display Name</th>
+                <th>Email</th>
+                <th style="width:110px;">Active</th>
+                <th style="width:180px;">Created</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Backdrop -->
+  <div id="modalBackdrop" class="modal-backdrop" hidden></div>
+
+  <!-- Modal for OTP (One Time Password) -->
+  <div id="otpModal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Reset Password & Send OTP</h2>
+        <button type="button" class="icon-btn" id="btnCloseModal" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="userId" value="0" />
+        <input type="hidden" id="userEmail" value="" />
+        <input type="hidden" id="userDisplayName" value="" />
+
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>Generated Password (OTP)</span>
+            <div style="display: flex; gap: 8px;">
+                <input id="otpValue" type="text" readonly style="flex: 1; background: #f3f4f6;" />
+                <button type="button" class="btn-secondary" id="btnGenerate">Generate</button>
+            </div>
+            <small style="color: #6b7280; margin-top: 4px;">This password will be saved and sent to the user via email.</small>
+          </label>
+        </div>
+
+        <div id="formError" class="form-error"></div>
+        <div id="formSuccess" style="color: green; margin-top: 10px; font-weight: 600;"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btnCancel">Cancel</button>
+        <button type="button" class="btn-primary" id="btnSend">Save & Send Email</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  
+  <script src="{{ url_for('static', filename='js/manage_users.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+
+</html>

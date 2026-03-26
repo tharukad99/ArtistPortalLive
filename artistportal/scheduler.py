@@ -19,8 +19,13 @@ def trigger_my_api(app):
             
             for record in artist_records:
                 artist_id = record.ArtistId
+                # local testing URL - change to actual API endpoint in production
                 url = f"http://127.0.0.1:5000/api/metrics/scrape/{artist_id}"
                 
+                # production URL example (uncomment and update if needed)
+                # url = f"http://your-production-domain.com/api/metrics/scrape/{artist_id}"
+
+
                 try:
                     response = requests.post(url)
                     print(f"API Trigger Response for Artist {artist_id}: {response.status_code}")
@@ -54,29 +59,16 @@ def init_scheduler(app):
     scheduler = BackgroundScheduler()
 
     # Add job to the scheduler. 
-    
-    # scheduler.add_job(
-    #     func=trigger_my_api,
-    #     trigger="interval",
-    #     weeks=1,  # <-- Runs 1 time per week
-    #     id="api_trigger_job",
-    #     replace_existing=True
-    # )
-
-
     scheduler.add_job(
     func=trigger_my_api,
     args=[app],
     trigger="cron",
-    day_of_week="thu", # <-- Runs every Thursday at 4.00 PM
-    hour=16,
+    day_of_week="sun", # <-- Runs ev ery Sunday at 12.00 PM
+    hour=12,
     minute=00,
     id="api_trigger_job",
     replace_existing=True
     )
-
-
-
 
 
     # Start the scheduler

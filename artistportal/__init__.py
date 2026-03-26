@@ -55,8 +55,9 @@ def create_app(config_object="config.Config"):
     from .routes.artist_profile import artist_profile_bp
     app.register_blueprint(artist_profile_bp)
 
-
-
+    # ---- Register Users blueprint (NEW) ----
+    from .routes.users import users_bp
+    app.register_blueprint(users_bp, url_prefix="/api/users")
 
     # ---- Register Artist Profile blueprint (NEW) ----
     # from .routes.metrics import sources_bp

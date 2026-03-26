@@ -9,5 +9,6 @@ from .models import (
     Platform,
     ArtistMetric,
     MasterUserName,
-    MasterspotifyUerId
+    MasterspotifyUerId,
+    OneTimePassword
 )
