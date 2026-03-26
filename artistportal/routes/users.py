@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from sqlalchemy import text
 from ..extensions import db
 from ..models import User
 from werkzeug.security import generate_password_hash
@@ -13,11 +14,10 @@ def list_users():
     if not current_user.IsAdmin:
         return jsonify({"error": "Unauthorized"}), 403
 
-    from sqlalchemy import text
     sql = text("""
-        SELECT u.*, a.ArtistId
+        SELECT u.*, ua.ArtistId AS AssignedArtistId
         FROM PortalUsers u
-        LEFT JOIN Artists a ON a.UserId = u.UserId
+        LEFT JOIN UserArtists ua ON ua.UserId = u.UserId
     """)
     rows = db.session.execute(sql).mappings().all()
     
@@ -35,8 +35,8 @@ def list_users():
                 "dateCreated": r["DateCreated"].strftime("%Y-%m-%d %H:%M:%S") if r["DateCreated"] else None,
                 "assignedArtists": []
             }
-        if r["ArtistId"]:
-             users_dict[uid]["assignedArtists"].append(r["ArtistId"])
+        if r["AssignedArtistId"]:
+             users_dict[uid]["assignedArtists"].append(r["AssignedArtistId"])
              
     return jsonify(list(users_dict.values()))
 
@@ -75,7 +75,7 @@ def create_user():
     if isinstance(assigned_artists, list) and len(assigned_artists) > 0:
         from sqlalchemy import text
         for artist_id in assigned_artists:
-            db.session.execute(text("UPDATE Artists SET UserId = :uid WHERE ArtistId = :aid"), {"uid": new_user.UserId, "aid": artist_id})
+            db.session.execute(text("INSERT INTO UserArtists (UserId, ArtistId) VALUES (:uid, :aid)"), {"uid": new_user.UserId, "aid": artist_id})
         db.session.commit()
     
     return jsonify({"success": True, "id": new_user.UserId})
@@ -146,9 +146,9 @@ def update_user(user_id):
         assigned_artists = data.get("assignedArtists")
         if isinstance(assigned_artists, list):
             from sqlalchemy import text
-            db.session.execute(text("UPDATE Artists SET UserId = NULL WHERE UserId = :uid"), {"uid": user.UserId})
+            db.session.execute(text("DELETE FROM UserArtists WHERE UserId = :uid"), {"uid": user.UserId})
             for artist_id in assigned_artists:
-                 db.session.execute(text("UPDATE Artists SET UserId = :uid WHERE ArtistId = :aid"), {"uid": user.UserId, "aid": artist_id})
+                 db.session.execute(text("INSERT INTO UserArtists (UserId, ArtistId) VALUES (:uid, :aid)"), {"uid": user.UserId, "aid": artist_id})
             db.session.commit()
 
     return jsonify({"success": True})
@@ -163,11 +163,9 @@ def delete_user(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
         
-    # Before deleting a user, decide whether to reassign artists or set them to NULL.
+    # Remove mappings and OTP records first to avoid foreign key constraints
     from sqlalchemy import text
-    db.session.execute(text("UPDATE Artists SET UserId = NULL WHERE UserId = :uid"), {"uid": user_id})
-
-    # Delete OTP records first to avoid foreign key constraints
+    db.session.execute(text("DELETE FROM UserArtists WHERE UserId = :uid"), {"uid": user_id})
     db.session.execute(text("DELETE FROM OneTimePasswords WHERE UserId = :uid"), {"uid": user_id})
 
     db.session.delete(user)

@@ -26,19 +26,18 @@ from flask_login import current_user
 def list_all_artists():
     if current_user.is_authenticated and current_user.IsAdmin:
         sql = text("""
-            SELECT a.*, u.Email 
+            SELECT a.*
             FROM Artists a
-            LEFT JOIN PortalUsers u ON a.UserId = u.UserId
             ORDER BY a.DateCreated DESC
         """)
         rows = db.session.execute(sql).mappings().all()
     else:
         user_id = current_user.UserId if current_user.is_authenticated else -1
         sql = text("""
-            SELECT a.*, u.Email 
+            SELECT a.*
             FROM Artists a
-            LEFT JOIN PortalUsers u ON a.UserId = u.UserId
-            WHERE a.UserId = :user_id
+            INNER JOIN UserArtists ua ON a.ArtistId = ua.ArtistId
+            WHERE ua.UserId = :user_id
             ORDER BY a.DateCreated DESC
         """)
         rows = db.session.execute(sql, {"user_id": user_id}).mappings().all()
@@ -54,8 +53,6 @@ def list_all_artists():
             "primaryGenre": r["PrimaryGenre"],
             "websiteUrl": r["WebsiteUrl"],
             "isActive": r["IsActive"],
-            "userId": r.get("UserId", None),
-            "email": r.get("Email", None), # For backward compatibility
             "dateCreated": r["DateCreated"].isoformat() if r["DateCreated"] else None
         }
         for r in rows
@@ -503,11 +500,15 @@ def api_update_artist(artist_id: int):
         # Update Assigned User if Admin
         if getattr(current_user, "IsAdmin", False) and "userId" in data:
             assigned_user_id = data.get("userId")
-            if assigned_user_id is None or assigned_user_id == 0 or assigned_user_id == "":
-                db.session.execute(text("UPDATE Artists SET UserId = NULL WHERE ArtistId = :aid"), {"aid": artist_id})
-            else:
-                db.session.execute(text("UPDATE Artists SET UserId = :uid WHERE ArtistId = :aid"), {"uid": int(assigned_user_id), "aid": artist_id})
-            db.session.commit()
+            if assigned_user_id is not None and assigned_user_id != 0 and assigned_user_id != "":
+                # Add this user to Manage this artist (append)
+                db.session.execute(text("""
+                    IF NOT EXISTS (SELECT 1 FROM UserArtists WHERE UserId = :uid AND ArtistId = :aid)
+                    BEGIN
+                        INSERT INTO UserArtists (UserId, ArtistId) VALUES (:uid, :aid)
+                    END
+                """), {"uid": int(assigned_user_id), "aid": artist_id})
+                db.session.commit()
 
         return jsonify({"success": True, "artistId": int(row["ArtistId"])})
 
@@ -524,7 +525,8 @@ def api_delete_artist_hard(artist_id: int):
         db.session.execute(text("DELETE FROM ArtistSources WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM Activities WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM ArtistMetrics WHERE ArtistId = :id"), {"id": artist_id})
-        db.session.execute(text("DELETE FROM PortalUsers WHERE ArtistId = :id"), {"id": artist_id})
+        # Remove junction mappings
+        db.session.execute(text("DELETE FROM UserArtists WHERE ArtistId = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM MasterUserName WHERE artistid = :id"), {"id": artist_id})
         db.session.execute(text("DELETE FROM MasterspotifyUerId WHERE artistid = :id"), {"id": artist_id})
 
